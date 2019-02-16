@@ -1,0 +1,31 @@
+{
+  "manifest_version": 2,
+  "name": "Plinfa",
+  "version": "0.1",
+  "permissions": [
+    "storage"
+  ],
+  "description": "Enables to subscribe to special formats on YT",
+
+  "icons": {
+    "48": "icons/baseline_label_black_48dp.png"
+  },
+  "browser_action": {
+    "default_title": "Plinfa",
+    "default_popup": "popup/plinfa.html",
+    "browser_style": true
+  },
+  "content_scripts": [{
+      "matches": ["https://*.youtube.com/feed/subscriptions*"],
+      "js": ["plinfa.js"]
+    }],
+ "homepage_url": "https://tincher.de",
+ "page_action": {
+     "default_icon":{
+         "48": "icons/baseline_label_black_48dp.png"
+     },
+     "show_matches": ["https://*.youtube.com/*"]
+ },
+ "pinned": true
+
+}
