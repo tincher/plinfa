@@ -1,7 +1,9 @@
+var childNodeChangeCount = 0;
+
 // create a consistent db item
 function createBlacklistItem(blackWord, blacklistObject) {
-    blacklistObject.value = (blacklistObject.value != undefined)?
-        blacklistObject.value.concat(blackWord): [blackWord];
+    blacklistObject.value = (blacklistObject.value != undefined) ?
+        blacklistObject.value.concat(blackWord) : [blackWord];
     // blacklistObject.value = [blackWord].concat(blacklistObject.value)
     return blacklistObject;
 }
@@ -12,17 +14,6 @@ function addItemToStorage(blackWord, blacklistObject) {
         .then(() => console.log("success"));
 }
 
-// collect the titles and return them in the right format
-function fetchTitles(videos, titles) {
-    var result = [];
-    for (var i = 0; i < videos.length; i++){
-            video = videos.item(i);
-            title = titles.item(i).children.namedItem("video-title").text;
-            result.push(title.toLowerCase().split(/\s|\\n/g).filter((x)=>x!="").join(" "));
-    }
-    return result;
-}
-
 // get the current storage
 function getStorage() {
     return browser.storage.local.get().then((result) => {
@@ -31,9 +22,9 @@ function getStorage() {
 }
 
 // filter the sub elements for the
-function filterSubsByBlacklist(videos, titles, blacklist){
+function filterSubsByBlacklist(videos, titles, blacklist) {
     titles.forEach((element) => {
-        if (isAnyFromArrayInString(blacklist, element)){
+        if (isAnyFromArrayInString(blacklist, element)) {
             removeSubFromSite(element, videos, titles);
         }
     });
@@ -50,23 +41,80 @@ function removeSubFromSite(videoTitle, videos, titles) {
 function isAnyFromArrayInString(words, title) {
     let result = false;
     words.value.forEach((word) => {
-        if (title.includes(word)) {
+        if (title.toLowerCase().includes(word)) {
             result = true;
         }
     });
     return result;
 }
 
-// main function
-function main() {
-    getStorage().then((blacklistObject) => {
-        var all_videos = document.getElementsByTagName("ytd-item-section-renderer");
-        var all_titles = document.getElementsByClassName("title-and-badge");
-        var titles = fetchTitles(all_videos, all_titles);
-        // addItemToStorage("wired", blacklistObject);
-        // addItemToStorage("nhl", blacklistObject);
-        filterSubsByBlacklist(all_videos, titles, blacklistObject);
-    })
+// get the video html elements
+function getVideos() {
+    let grid_videos = document.getElementsByTagName("ytd-grid-video-renderer");
+    let list_videos = document.getElementsByTagName("ytd-item-section-renderer");
+    return (grid_videos.length > list_videos.length) ? grid_videos : list_videos;
 }
 
-main();
+// get all the titles as string array
+function getTitles() {
+    let grid_titles = document.getElementsByClassName("yt-simple-endpoint style-scope ytd-grid-video-renderer");
+    let list_titles = document.getElementsByClassName("title-and-badge");
+    result = [];
+    if (grid_titles.length > list_titles.length) {
+        for (var i = 0; i < grid_titles.length; i++) {
+            result.push(grid_titles.item(i).text);
+        }
+    } else {
+        for (var i = 0; i < list_titles.length; i++) {
+            title = list_titles.item(i).children.namedItem("video-title").text;
+            result.push(title.toLowerCase().split(/\s|\\n/g).filter((x) => x != "").join(" "));
+        }
+    }
+    return result;
+}
+
+// main function to control the filter
+function main() {
+    getStorage().then((blacklistObject) => {
+        var all_videos = getVideos();
+        var all_titles = getTitles();
+        addItemToStorage("auto alphabet", blacklistObject);
+        // addItemToStorage("nhl", blacklistObject);
+        filterSubsByBlacklist(all_videos, all_titles, blacklistObject);
+        console.log("time #1");
+    });
+    console.log("time #2");
+}
+
+// initialize the observer to count the changes of child nodes
+function initObserver() {
+    var callback = function(mutationsList, observer) {
+        for (var mutation of mutationsList) {
+            if (mutation.type == 'childList') {
+                childNodeChangeCount += 1;
+            }
+        }
+    };
+    var observer = new MutationObserver(callback);
+    var targetNode = document.getElementById("page-manager");
+    var config = {
+        childList: true,
+        subtree: true
+    };
+    observer.observe(targetNode, config);
+}
+
+// initialize the observer
+initObserver();
+
+// checks if the childNodeChangeCount is over 200 and sets it to 0 afterwards
+var checkForSiteChange = function() {
+    if (childNodeChangeCount > 200) {
+        console.log(childNodeChangeCount);
+        main();
+    }
+    childNodeChangeCount = 0;
+}
+
+// run checkForSiteChange every 200 ms
+window.setInterval(checkForSiteChange, 200);

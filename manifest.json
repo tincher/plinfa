@@ -5,9 +5,10 @@
         "browser_style": true
     },
     "content_scripts": [{
-        "matches": ["https://www.youtube.com/feed/sub*"],
+        "matches": ["https://www.youtube.com/feed/subscriptions*"],
         "js": ["plinfa.js"],
-        "css": ["plinfa.css"]
+        "run_at": "document_end",
+        "all_frames": true
     }],
     "description": "Enables to subscribe to special formats on YT",
     "homepage_url": "https://tincher.de",
