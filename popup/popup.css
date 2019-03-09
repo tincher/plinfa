@@ -1,6 +1,8 @@
-body{
+body {
     margin: 10px;
+    width: 250px;
 }
-label{
+
+label {
     margin-right: 5px;
 }

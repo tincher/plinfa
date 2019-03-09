@@ -4,7 +4,6 @@ var childNodeChangeCount = 0;
 function createBlacklistItem(blackWord, blacklistObject) {
     blacklistObject.value = (blacklistObject.value != undefined) ?
         blacklistObject.value.concat(blackWord) : [blackWord];
-    // blacklistObject.value = [blackWord].concat(blacklistObject.value)
     return blacklistObject;
 }
 
