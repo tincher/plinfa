@@ -103,17 +103,17 @@ function initObserver() {
     observer.observe(targetNode, config);
 }
 
-// initialize the observer
-initObserver();
-
-// checks if the childNodeChangeCount is over 200 and sets it to 0 afterwards
-var checkForSiteChange = function() {
-    if (childNodeChangeCount > 200) {
-        console.log(childNodeChangeCount);
-        main();
+// if active setting is set, the initialization is started
+browser.storage.sync.get('active').then((result) => {
+    if (result.active) {
+        initObserver();
+        var checkForSiteChange = function() {
+            if (childNodeChangeCount > 200) {
+                console.log(childNodeChangeCount);
+                main();
+            }
+            childNodeChangeCount = 0;
+        }
+        window.setInterval(checkForSiteChange, 200);
     }
-    childNodeChangeCount = 0;
-}
-
-// run checkForSiteChange every 200 ms
-window.setInterval(checkForSiteChange, 200);
+});

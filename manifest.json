@@ -1,7 +1,7 @@
 {
     "applications": {
-        "plinfa": {
-            "id": "joel.ewig@gmail.com",
+        "gecko": {
+            "id": "joel.ewig@gmail.com"
         }
     },
     "background": {
