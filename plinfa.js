@@ -33,7 +33,6 @@ function filterSubsByBlacklist(videos, titles, blacklist) {
 function removeSubFromSite(videoTitle, videos, titles) {
     videoIndex = titles.indexOf(videoTitle);
     videos[videoIndex].parentNode.removeChild(videos[videoIndex]);
-    console.log("Index: " + videoIndex);
 }
 
 // checks if any of the keywords is in the provided title
@@ -80,9 +79,7 @@ function main() {
         addItemToStorage("auto alphabet", blacklistObject);
         // addItemToStorage("nhl", blacklistObject);
         filterSubsByBlacklist(all_videos, all_titles, blacklistObject);
-        console.log("time #1");
     });
-    console.log("time #2");
 }
 
 // initialize the observer to count the changes of child nodes
@@ -109,11 +106,19 @@ browser.storage.sync.get('active').then((result) => {
         initObserver();
         var checkForSiteChange = function() {
             if (childNodeChangeCount > 200) {
-                console.log(childNodeChangeCount);
                 main();
             }
             childNodeChangeCount = 0;
         }
         window.setInterval(checkForSiteChange, 200);
     }
+});
+
+
+browser.runtime.onMessage.addListener(request => {
+    main();
+    return Promise.resolve({
+        response: "Message received"
+    });
+
 });
