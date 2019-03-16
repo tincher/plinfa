@@ -2,14 +2,25 @@
 
     <head>
         <meta charset="utf-8">
+        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
         <link rel="stylesheet" href="popup.css" />
     </head>
 
     <body>
-        <div id="popup-content">
-            <label id="blackinput">Formatname:</label>
-            <input id="blacklistInput" />
-        </div>
+        <form class="pure-form pure-form-aligned">
+            <fieldset>
+                <div class="pure-control-group">
+                    <label for="name">Blackword</label>
+                    <input id="wordInput" type="text" placeholder="Blackword">
+                    <!-- TODO feedback on success -->
+                </div>
+
+                <div class="pure-control-group">
+                    <label for="password">Channel</label>
+                    <input id="channelInput" type="text" placeholder="Channel">
+                </div>
+            </fieldset>
+        </form>
         <script src="popup.js"></script>
     </body>
 
