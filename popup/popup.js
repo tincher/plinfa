@@ -1,15 +1,36 @@
-var input = document.getElementById("blacklistInput");
-input.addEventListener("keydown", (item) => {
-    if (item.keyCode === 13) {
-        browser.storage.local.get().then((blacklistObject) => {
-            blacklistObject.value = (blacklistObject.value != undefined) ?
-                blacklistObject.value.concat(input.value.toLowerCase()) : [input.value.toLowerCase()];
-            browser.storage.local.set(blacklistObject);
+wordInput = document.getElementById("wordInput");
+channelInput = document.getElementById("channelInput");
 
-            sendPageReloadMessage();
-        });
-    }
+wordInput.addEventListener("keydown", (item) => {
+    handleKeyEvent(item);
 });
+channelInput.addEventListener('keydown', (item) => {
+    handleKeyEvent(item);
+})
+
+function handleKeyEvent(item) {
+    // TODO feedback on success
+    if (item.keyCode === 13) {
+        saveToDB(wordInput.value, channelInput.value);
+        sendPageReloadMessage();
+    }
+}
+
+function saveToDB(word, channel) {
+    let dbObject = createDbObjekt(word, channel);
+    browser.storage.local.get().then((storageBlacklist) => {
+        storageBlacklist.value = (storageBlacklist.value != undefined) ?
+            storageBlacklist.value.concat(dbObject) : [dbObject];
+        browser.storage.local.set(storageBlacklist);
+    });
+}
+
+function createDbObjekt(word, channel) {
+    return {
+        'word': word.toLowerCase(),
+        'channel': channel.toLowerCase()
+    };
+}
 
 function sendPageReloadMessage() {
     browser.tabs.query({
