@@ -1,7 +1,7 @@
-wordInput = document.getElementById("wordInput");
-channelInput = document.getElementById("channelInput");
+wordInput = document.getElementById('wordInput');
+channelInput = document.getElementById('channelInput');
 
-wordInput.addEventListener("keydown", (item) => {
+wordInput.addEventListener('keydown', (item) => {
     handleKeyEvent(item);
 });
 channelInput.addEventListener('keydown', (item) => {
@@ -27,8 +27,9 @@ function saveToDB(word, channel) {
 
 function createDbObjekt(word, channel) {
     return {
+        'channel': channel.toLowerCase(),
+        'whitelist': false,
         'word': word.toLowerCase(),
-        'channel': channel.toLowerCase()
     };
 }
 
@@ -52,3 +53,16 @@ function sendPageReloadMessage() {
         console.error(`Error: ${error}`);
     });
 }
+
+
+
+var dashboardButton = document.getElementById('dashboard-button');
+dashboardButton.addEventListener('click', (e) => {
+    console.log('success');
+    var createdTab = browser.tabs.create({
+        url: '/dashboard/dashboard.html'
+    });
+    createdTab.catch((error) => {
+        console.log('error')
+    });
+});

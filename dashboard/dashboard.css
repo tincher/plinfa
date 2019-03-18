@@ -1,0 +1,19 @@
+body {
+    margin-top: 20px;
+}
+
+.pure-table {
+    width: 100%;
+}
+
+.explanation {
+    margin-top: 15px;
+}
+
+input[type="radio"] {
+    margin: 5px;
+}
+
+button {
+    margin-top: 5px;
+}

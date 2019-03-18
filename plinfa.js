@@ -16,7 +16,7 @@ function main() {
         const all_titles = getTitles();
         const all_channels = getChannelNames();
         // addItemToStorage("auto alphabet", "jp performance", blacklistObject);
-        addItemToStorage("top 10", "Onefootball Deutschland", blacklistObject);
+        // addItemToStorage("top 10", "Onefootball Deutschland", blacklistObject);
         filterSubsByBlacklist(all_videos, all_titles, all_channels, blacklistObject);
     });
 }
@@ -94,11 +94,11 @@ function createDbObjekt(word, channel) {
     };
 }
 
-// store the given word to the db
-function addItemToStorage(blackWord, blackChannel, blacklistObject) {
-    browser.storage.local.set(createBlacklistItem(blackWord, blackChannel, blacklistObject))
-        .then(() => console.log("success"));
-}
+// // store the given word to the db
+// function addItemToStorage(blackWord, blackChannel, blacklistObject) {
+//     browser.storage.local.set(createBlacklistItem(blackWord, blackChannel, blacklistObject))
+//         .then(() => console.log("success"));
+// }
 
 // get the current storage
 function getStorage() {
@@ -163,30 +163,14 @@ function filterSubsByBlacklist(videos, titles, channels, blacklist) {
     });
 }
 
+// filters if the series of this channel is in your blacklist
 function isSeriesBlacklisted(blacklist, title, channel) {
     let result = false;
     blacklist.value.forEach((blacklistElement) => {
         if (title.toLowerCase().includes(blacklistElement.word) && channel.text.toLowerCase() == blacklistElement.channel) {
             result = true;
-            // break
+            // break; equivalent for foreach, maybe rebuild it to Array#some or sth
         }
     });
     return result;
 }
-
-
-// // checks if any of the keywords is in the provided title
-// function isAnyFromArrayInString(words, title) {
-//     let result = false;
-//     words.value.forEach((word) => {
-//         if (title.toLowerCase().includes(word)) {
-//             result = true;
-//         }
-//     });
-//     return result;
-// }
-
-
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
-// -----------------------------------------------------------------------------
