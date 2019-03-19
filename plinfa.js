@@ -15,12 +15,11 @@ function main() {
         const all_videos = getVideos();
         const all_titles = getTitles();
         const all_channels = getChannelNames();
-        // addItemToStorage("auto alphabet", "jp performance", blacklistObject);
-        // addItemToStorage("top 10", "Onefootball Deutschland", blacklistObject);
         filterSubsByBlacklist(all_videos, all_titles, all_channels, blacklistObject);
     });
 }
 
+main();
 
 // if active setting is set, the initialization is started
 browser.storage.sync.get('active').then((result) => {
@@ -78,28 +77,6 @@ browser.runtime.onMessage.addListener(request => {
 // STORAGE INTERACTION
 // -----------------------------------------------------------------------------
 
-// create a consistent db item
-function createBlacklistItem(blackWord, blackChannel, blacklistObject) {
-    let dbObject = createDbObjekt(blackWord, blackChannel);
-    blacklistObject.value = (blacklistObject.value != undefined) ?
-        blacklistObject.value.concat(dbObject) : [dbObject];
-    return blacklistObject;
-}
-
-// create db object
-function createDbObjekt(word, channel) {
-    return {
-        'word': word.toLowerCase(),
-        'channel': channel.toLowerCase()
-    };
-}
-
-// // store the given word to the db
-// function addItemToStorage(blackWord, blackChannel, blacklistObject) {
-//     browser.storage.local.set(createBlacklistItem(blackWord, blackChannel, blacklistObject))
-//         .then(() => console.log("success"));
-// }
-
 // get the current storage
 function getStorage() {
     return browser.storage.local.get().then((result) => {
@@ -116,7 +93,7 @@ function getStorage() {
 function getVideos() {
     let grid_videos = document.getElementsByTagName("ytd-grid-video-renderer");
     let list_videos = document.getElementsByTagName("ytd-item-section-renderer");
-    return (grid_videos.length > list_videos.length) ? grid_videos : list_videos;
+    return (grid_videos.length > list_videos.length) ? Array.from(grid_videos) : Array.from(list_videos);
 }
 
 // remove the subscription video from the site
@@ -127,7 +104,7 @@ function removeSubFromSite(videoTitle, videos, titles) {
 
 // get channel names
 function getChannelNames() {
-    return document.getElementsByClassName('yt-simple-endpoint style-scope yt-formatted-string');
+    return Array.from(document.getElementsByClassName('yt-simple-endpoint style-scope yt-formatted-string'));
 }
 
 // get all the titles as string array
@@ -157,20 +134,25 @@ function getTitles() {
 // filter the sub elements for the
 function filterSubsByBlacklist(videos, titles, channels, blacklist) {
     titles.forEach((title, i) => {
-        if (isSeriesBlacklisted(blacklist, title, channels[i])) {
+        if (hasToBeRemoved(blacklist, title, channels[i])) {
             removeSubFromSite(title, videos, titles);
         }
     });
 }
 
-// filters if the series of this channel is in your blacklist
-function isSeriesBlacklisted(blacklist, title, channel) {
-    let result = false;
-    blacklist.value.forEach((blacklistElement) => {
-        if (title.toLowerCase().includes(blacklistElement.word) && channel.text.toLowerCase() == blacklistElement.channel) {
-            result = true;
-            // break; equivalent for foreach, maybe rebuild it to Array#some or sth
+// filters if the series of this channel is in your blacklist or not on your whitelist
+function hasToBeRemoved(list, title, channel) {
+    for (i = 0; i < list.value.length; i++) {
+        let elem = list.value[i];
+        if (elem.channel == channel.text.toLowerCase()) {
+            if (elem.words.some(x => title.toLowerCase().includes(x))) {
+                if (!elem.whitelist) {
+                    return true;
+                }
+            } else if (elem.whitelist) {
+                return true;
+            }
         }
-    });
-    return result;
+    }
+    return false;
 }

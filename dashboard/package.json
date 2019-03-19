@@ -4,7 +4,8 @@
   "description": "",
   "main": "dashboard.js",
   "dependencies": {
-    "clusterize.js": "^0.18.1"
+    "clusterize.js": "^0.18.1",
+    "purecss": "^1.0.0"
   },
   "devDependencies": {},
   "scripts": {

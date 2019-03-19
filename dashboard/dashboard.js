@@ -17,11 +17,10 @@ function main() {
 
 // build table rows from config object
 function buildTableRows(config) {
-    let counter = 0;
     let result = [];
-    config.forEach((configEntry) => {
+    // map?! TODO
+    config.forEach((configEntry, counter) => {
         result.push(buildTableRow(configEntry, counter));
-        counter++;
     });
     return result;
 }
@@ -31,7 +30,7 @@ function buildTableRow(configEntry, counter) {
     // seperate words
     let channelString = `<td>${configEntry.channel}</td>`
     let listTypeString = `<td><div><input name="whitelist${counter}" type="radio" ${configEntry.whitelist ? "checked" : ""}>Whitelist<input name="whitelist${counter}" type="radio" ${configEntry.whitelist ? "" : "checked"}>Blacklist</div></td>`
-    let valuesString = `<td><input style="width: 100%" type="text" value="${configEntry.values}"></input></td>`
+    let valuesString = `<td><input style="width: 100%" type="text" value="${configEntry.words}"></input></td>`
     return `<tr>${channelString}${listTypeString}${valuesString}</tr>`;
 }
 
@@ -62,7 +61,7 @@ function parseTrowToConfigEntry(entry) {
     let children = entry.children;
     let result = {
         channel: children.item(0).textContent,
-        values: children.item(2).children.item(0).value.split(','),
+        words: children.item(2).children.item(0).value.split(','),
         whitelist: children.item(1).children.item(0).children.item(0).checked
     };
     return result;
