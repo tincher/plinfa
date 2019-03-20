@@ -1,4 +1,7 @@
+// -----------------------------------------------------------------------------
 // variables
+// -----------------------------------------------------------------------------
+
 channelInput = document.getElementById('channelInput');
 wordInput = document.getElementById('wordInput');
 whitelistRadioButton = document.getElementById('whitelist');
@@ -99,13 +102,7 @@ function searchAndShow(input) {
     });
 }
 
-// builds html list items from given list
-function buildList(list) {
-    let result = [];
-    list.forEach((element, i) => result.push(`<li id="${i}" class="pure-menu-item pure-menu-link">${element.channel}</li>`));
-    return result;
-}
-
+// en- / disables inputs
 function lockInputs(locked) {
     wordInput.disabled = locked;
     whitelistRadioButton.disabled = locked;
@@ -113,10 +110,13 @@ function lockInputs(locked) {
 }
 
 
+// -----------------------------------------------------------------------------
+// storage related
+// -----------------------------------------------------------------------------
+
 // gets the new config object and saves it, on success it sends a reload message to the tab
 function save() {
     browser.storage.local.get().then((storageBlacklist) => {
-        // TODO refactoring / optimisation
         let dbObject = createDbObjekt(wordInput.value, channelInput.value, whitelistRadioButton.checked);
         if (storageBlacklist.value !== undefined) {
             let index = storageBlacklist.value.findIndex(y => y.channel == channelInput.value)
@@ -143,6 +143,23 @@ function createDbObjekt(words, channel, whitelist) {
         words: words.split(',').map(x => x.trim().toLowerCase())
     };
 }
+
+
+// -----------------------------------------------------------------------------
+// builder
+// -----------------------------------------------------------------------------
+
+// builds html list items from given list
+function buildList(list) {
+    let result = [];
+    list.forEach((element, i) => result.push(`<li id="${i}" class="pure-menu-item pure-menu-link">${element.channel}</li>`));
+    return result;
+}
+
+
+// -----------------------------------------------------------------------------
+// communication with other extension parts
+// -----------------------------------------------------------------------------
 
 // send simple message to all active, current tabs, extension tab should reload
 function sendPageReloadMessage() {

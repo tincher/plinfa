@@ -1,4 +1,26 @@
-// init clusterize and btnclusterize with emtpy dataset
+// -----------------------------------------------------------------------------
+// event listeners
+// -----------------------------------------------------------------------------
+
+// button click saves config to local storage
+document.getElementById('saveButton').addEventListener('click', (event) => {
+    let tbody = document.getElementById('contentArea');
+    let config = {
+        value: parseTbodyToConfig(tbody)
+    };
+    browser.storage.local.set(config).then((e) => {
+        main();
+    }).catch((error) => {
+        console.log(error);
+    });
+});
+
+
+// -----------------------------------------------------------------------------
+// initialisation
+// -----------------------------------------------------------------------------
+
+// init clusterize.js with emtpy dataset
 data = [];
 delButtons = [];
 clusterize = new Clusterize({
@@ -17,8 +39,16 @@ btnClusterize = new Clusterize({
 // btnContainer for eventlistener below
 btnDiv = document.getElementById('buttonContent');
 
+// run main
+updateSite();
+
+
+// -----------------------------------------------------------------------------
+// update site
+// -----------------------------------------------------------------------------
+
 // get config from storage, build rows, push them to clusterize
-function main() {
+function updateSite() {
     browser.storage.local.get().then((config) => {
         let data = buildTableRows(config.value);
         clusterize.update(data);
@@ -32,6 +62,11 @@ function main() {
         console.log(error);
     });
 }
+
+
+// -----------------------------------------------------------------------------
+// builder
+// -----------------------------------------------------------------------------
 
 // build table rows from config object
 function buildTableRows(config) {
@@ -64,18 +99,10 @@ function buildDummyRow(counter) {
     return buildTableRow(configEntry, counter)
 }
 
-// button click saves config to local storage
-document.getElementById('saveButton').addEventListener('click', (event) => {
-    let tbody = document.getElementById('contentArea');
-    let config = {
-        value: parseTbodyToConfig(tbody)
-    };
-    browser.storage.local.set(config).then((e) => {
-        main();
-    }).catch((error) => {
-        console.log(error);
-    });
-});
+
+// -----------------------------------------------------------------------------
+// parser (from table to config)
+// -----------------------------------------------------------------------------
 
 // builds config entry from table row
 function parseTrowToConfigEntry(entry) {

@@ -1,3 +1,18 @@
+// -----------------------------------------------------------------------------
+// event listeners
+// -----------------------------------------------------------------------------
+
+// restores options on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', restoreOptions);
+
+// saves options on click
+document.getElementById('active').addEventListener('click', saveOptions);
+
+
+// -----------------------------------------------------------------------------
+// option functions
+// -----------------------------------------------------------------------------
+
 // save the options to sync storage
 function saveOptions() {
     let checkbox = document.getElementById('active').checked;
@@ -20,9 +35,3 @@ function restoreOptions() {
     var getting = browser.storage.sync.get('active');
     getting.then(setCurrentChoice, onError);
 }
-
-// restores options on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', restoreOptions);
-
-// saves options on click
-document.getElementById('active').addEventListener('click', saveOptions);
