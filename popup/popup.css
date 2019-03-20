@@ -21,12 +21,12 @@ input[type="text"] {
 }
 
 #save-button {
-  background-color: green;
-  width: 49%;
-  float: left;
+    background-color: green;
+    width: 49%;
+    float: left;
 }
 
 #dashboard-button {
-  width: 49%;
-  float: right;
+    width: 49%;
+    float: right;
 }

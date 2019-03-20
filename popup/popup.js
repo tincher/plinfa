@@ -41,6 +41,11 @@ channelInput.addEventListener('input', (event) => {
     }
 });
 
+// save button
+saveButton.addEventListener('click', (event) => {
+    save();
+});
+
 // if enter is pushed in one of the input boxes, it saves the config
 channelInput.addEventListener('keydown', saveOnEnter);
 wordInput.addEventListener('keydown', saveOnEnter);

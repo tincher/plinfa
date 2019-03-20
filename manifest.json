@@ -30,6 +30,6 @@
         "default_title": "Plinfa",
         "show_matches": ["https://www.youtube.com/feed/subscriptions*"]
     },
-    "permissions": ["contextMenus", "storage"],
+    "permissions": ["contextMenus", "storage", "webRequest", "*://*.youtube.com/*"],
     "version": "0.3"
 }

@@ -71,7 +71,7 @@ function updateSite() {
 // build table rows from config object
 function buildTableRows(config) {
     let result = [];
-    // map?! TODO
+    // TODO map?! 
     config.forEach((configEntry, counter) => {
         result.push(buildTableRow(configEntry, counter));
     });

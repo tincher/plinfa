@@ -5,3 +5,28 @@
 // }, onCreated);
 //
 // remove from context menu
+
+
+browser.webRequest.onBeforeRequest.addListener((details) => {
+    browser.tabs.query({
+        currentWindow: true,
+        active: true
+    }).then((tabs) => {
+        for (let tab of tabs) {
+            browser.tabs.sendMessage(
+                tab.id, {
+                    reload: true,
+                    isFromBackground: true
+                }
+            ).then(response => {
+                console.log(response);
+            }).catch((error) => {
+                console.error(`Error: ${error}`);
+            });
+        }
+    }).catch((error) => {
+        console.error(`Error: ${error}`);
+    });
+}, {
+    urls: ['*://*.youtube.com/*']
+});

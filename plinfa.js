@@ -3,6 +3,13 @@
 // -----------------------------------------------------------------------------
 
 let childNodeChangeCount = 0;
+let unfiltered_videos;
+let live_videos;
+let live_videos_length;
+
+function appendToUnfiltered(items) {
+    unfiltered_videos.push(items);
+}
 
 
 // -----------------------------------------------------------------------------
@@ -12,16 +19,31 @@ let childNodeChangeCount = 0;
 // main function to control the filter
 function main() {
     getStorage().then((blacklistObject) => {
-        const all_videos = getVideos();
-        const all_titles = getTitles();
-        const all_channels = getChannelNames();
-        filterSubsByBlacklist(all_videos, all_titles, all_channels, blacklistObject);
+        if (blacklistObject.value !== undefined) {
+            if (live_videos !== undefined) {
+                live_videos_length = live_videos.length;
+            }
+            live_videos = getVideos();
+            if (unfiltered_videos === undefined) {
+                unfiltered_videos = getVideos();
+            }
+            restoreSubs();
+            const all_titles = getTitles();
+            const all_channels = getChannelNames();
+            filterSubsByBlacklist(live_videos, all_titles, all_channels, blacklistObject);
+        }
     });
 }
 
-main();
+function restoreSubs() {
+    for (i = 0; live_videos.length < unfiltered_videos.length; i++) {
+        console.log(live_videos);
+        console.log(unfiltered_videos);
+    }
+}
 
 // if active setting is set, the initialization is started
+// TODO may be removed
 browser.storage.sync.get('active').then((result) => {
     if (result.active || result.active == undefined) {
         initObserver();
@@ -33,6 +55,27 @@ browser.storage.sync.get('active').then((result) => {
         }
         window.setInterval(checkForSiteChange, 200);
     }
+});
+
+
+// -----------------------------------------------------------------------------
+// COMMUNICATION WITH OTHER WEB-EXT PARTS
+// -----------------------------------------------------------------------------
+
+// listens for message from popup and runs the main method following the message
+browser.runtime.onMessage.addListener(request => {
+    if (request.isFromBackground && live_videos !== undefined) {
+        if (live_videos.length > live_videos_length) {
+            let x = Array.from(live_videos).slice(live_videos_length);
+            console.log(`New: ${x.length}, Index: ${live_videos_length}, LVLength: ${live_videos.length}`);
+            live_videos_length = live_videos.length;
+        }
+    }
+    main();
+    return Promise.resolve({
+        response: "Message received"
+    });
+
 });
 
 
@@ -59,19 +102,6 @@ function initObserver() {
 }
 
 
-// -----------------------------------------------------------------------------
-// COMMUNICATION WITH OTHER WEB-EXT PARTS
-// -----------------------------------------------------------------------------
-
-// listens for message from popup and runs the main method following the message
-browser.runtime.onMessage.addListener(request => {
-    main();
-    return Promise.resolve({
-        response: "Message received"
-    });
-
-});
-
 
 // -----------------------------------------------------------------------------
 // STORAGE INTERACTION
@@ -89,17 +119,21 @@ function getStorage() {
 // SITE INTERACTION
 // -----------------------------------------------------------------------------
 
-// get the video html elements
-function getVideos() {
-    let grid_videos = document.getElementsByTagName("ytd-grid-video-renderer");
-    let list_videos = document.getElementsByTagName("ytd-item-section-renderer");
-    return (grid_videos.length > list_videos.length) ? Array.from(grid_videos) : Array.from(list_videos);
+function injectSubBackInSite(index) {
+
 }
 
 // remove the subscription video from the site
 function removeSubFromSite(videoTitle, videos, titles) {
     let videoIndex = titles.indexOf(videoTitle);
     videos[videoIndex].parentNode.removeChild(videos[videoIndex]);
+}
+
+// get the video html elements
+function getVideos() {
+    let grid_videos = document.getElementsByTagName("ytd-grid-video-renderer");
+    let list_videos = document.getElementsByTagName("ytd-item-section-renderer");
+    return (grid_videos.length > list_videos.length) ? grid_videos : list_videos;
 }
 
 // get channel names
