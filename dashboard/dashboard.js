@@ -9,7 +9,7 @@ document.getElementById('saveButton').addEventListener('click', (event) => {
         value: parseTbodyToConfig(tbody)
     };
     browser.storage.local.set(config).then((e) => {
-        main();
+        updateSite();
     }).catch((error) => {
         console.log(error);
     });
@@ -39,7 +39,7 @@ btnClusterize = new Clusterize({
 // btnContainer for eventlistener below
 btnDiv = document.getElementById('buttonContent');
 
-// run main
+// run updateSite
 updateSite();
 
 
@@ -54,8 +54,8 @@ function updateSite() {
         clusterize.update(data);
         delButtons = [];
         data.forEach((row, counter) => {
-          let btn_str = `<button class='pure-button deleteButton' id=${counter}><i class="fas fa-trash"></i></button>`;
-          delButtons.push(btn_str);
+            let btn_str = `<button class='pure-button deleteButton' id=${counter}><i class="fas fa-trash"></i></button>`;
+            delButtons.push(btn_str);
         });
         btnClusterize.update(delButtons);
     }).catch((error) => {
@@ -71,7 +71,7 @@ function updateSite() {
 // build table rows from config object
 function buildTableRows(config) {
     let result = [];
-    // TODO map?! 
+    // TODO map?!
     config.forEach((configEntry, counter) => {
         result.push(buildTableRow(configEntry, counter));
     });
@@ -126,17 +126,17 @@ function parseTbodyToConfig(tbody) {
 
 // deletes selected row from config, refreshes dashboard
 btnDiv.addEventListener('click', e => {
-  row_ind = e.target.attributes.id.value;
-  if (row_ind != 'buttonContent') {
-    console.log(row_ind);
-    browser.storage.local.get().then((config) => {
-      delete config.value[row_ind];
-      browser.storage.local.set(config).then(e => {
-        main();
-      });
-    });
-  }
+    row_ind = e.target.attributes.id.value;
+    if (row_ind != 'buttonContent') {
+        console.log(row_ind);
+        browser.storage.local.get().then((config) => {
+            delete config.value[row_ind];
+            browser.storage.local.set(config).then(e => {
+                updateSite();
+            });
+        });
+    }
 });
 
-// run main
-main();
+// run updateSite
+updateSite();

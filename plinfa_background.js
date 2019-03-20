@@ -7,7 +7,7 @@
 // remove from context menu
 
 
-browser.webRequest.onBeforeRequest.addListener((details) => {
+browser.webRequest.onCompleted.addListener((details) => {
     browser.tabs.query({
         currentWindow: true,
         active: true

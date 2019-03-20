@@ -85,11 +85,6 @@ function showDropdown(show) {
     dropdownContent.style.display = show ? '' : 'none';
 }
 
-
-// -----------------------------------------------------------------------------
-// page interaction
-// -----------------------------------------------------------------------------
-
 // searches for the input in the channel list in config and fills the dropdown with it
 function searchAndShow(input) {
     browser.storage.local.get().then((config) => {
@@ -175,7 +170,8 @@ function sendPageReloadMessage() {
         for (let tab of tabs) {
             browser.tabs.sendMessage(
                 tab.id, {
-                    reload: true
+                    reload: true,
+                    isFromBackground: false
                 }
             ).then(response => {
                 window.close(); // maybe something more green
@@ -190,5 +186,5 @@ function sendPageReloadMessage() {
 
 // save when save button is clicked
 saveButton.addEventListener('click', (e) => {
-  save();
+    save();
 })
