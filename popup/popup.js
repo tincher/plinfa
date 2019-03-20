@@ -5,6 +5,7 @@ whitelistRadioButton = document.getElementById('whitelist');
 blacklistRadioButton = document.getElementById('blacklist');
 dropdownContent = document.getElementById('dropdown');
 dashboardButton = document.getElementById('dashboard-button');
+saveButton = document.getElementById('save-button');
 
 
 // -----------------------------------------------------------------------------
