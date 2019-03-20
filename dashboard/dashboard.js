@@ -137,6 +137,3 @@ btnDiv.addEventListener('click', e => {
         });
     }
 });
-
-// run updateSite
-updateSite();
