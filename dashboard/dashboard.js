@@ -9,7 +9,7 @@ document.getElementById('saveButton').addEventListener('click', (event) => {
         value: parseTbodyToConfig(tbody)
     };
     browser.storage.local.set(config).then((e) => {
-        main();
+        updateSite();
     }).catch((error) => {
         console.log(error);
     });
@@ -39,7 +39,7 @@ btnClusterize = new Clusterize({
 // btnContainer for eventlistener below
 btnDiv = document.getElementById('buttonContent');
 
-// run main
+// run updateSite
 updateSite();
 
 
@@ -71,7 +71,7 @@ function updateSite() {
 // build table rows from config object
 function buildTableRows(config) {
     let result = [];
-    // TODO map?! 
+    // TODO map?!
     config.forEach((configEntry, counter) => {
         result.push(buildTableRow(configEntry, counter));
     });
@@ -132,11 +132,8 @@ btnDiv.addEventListener('click', e => {
     browser.storage.local.get().then((config) => {
       delete config.value[row_ind];
       browser.storage.local.set(config).then(e => {
-        main();
+        updateSite();
       });
     });
   }
 });
-
-// run main
-main();
