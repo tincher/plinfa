@@ -1,16 +1,33 @@
-// init clusterize.js with emtpy dataset
+// init clusterize and btnclusterize with emtpy dataset
 data = [];
+delButtons = [];
 clusterize = new Clusterize({
     rows: data,
     scrollId: 'scrollArea',
-    contentId: 'contentArea'
+    contentId: 'contentArea',
+    show_no_data_row: false,
 });
+btnClusterize = new Clusterize({
+    rows: delButtons,
+    scrollId: 'buttonScroll',
+    contentId: 'buttonContent',
+    show_no_data_row: false
+});
+
+// btnContainer for eventlistener below
+btnDiv = document.getElementById('buttonContent');
 
 // get config from storage, build rows, push them to clusterize
 function main() {
     browser.storage.local.get().then((config) => {
-        var data = buildTableRows(config.value);
+        let data = buildTableRows(config.value);
         clusterize.update(data);
+        delButtons = [];
+        data.forEach((row, counter) => {
+          let btn_str = `<button class='pure-button deleteButton' id=${counter}><i class="fas fa-trash"></i></button>`;
+          delButtons.push(btn_str);
+        });
+        btnClusterize.update(delButtons);
     }).catch((error) => {
         console.log(error);
     });
@@ -25,6 +42,7 @@ function buildTableRows(config) {
     });
     return result;
 }
+
 
 // build a single table row from config entry
 function buildTableRow(configEntry, counter) {
@@ -78,6 +96,20 @@ function parseTbodyToConfig(tbody) {
     }
     return result;
 }
+
+// deletes selected row from config, refreshes dashboard
+btnDiv.addEventListener('click', e => {
+  row_ind = e.target.attributes.id.value;
+  if (row_ind != 'buttonContent') {
+    console.log(row_ind);
+    browser.storage.local.get().then((config) => {
+      delete config.value[row_ind];
+      browser.storage.local.set(config).then(e => {
+        main();
+      });
+    });
+  }
+});
 
 // run main
 main();

@@ -23,7 +23,7 @@ input[type="text"] {
 #save-button {
   background-color: green;
   width: 49%;
-  float left;
+  float: left;
 }
 
 #dashboard-button {

@@ -119,7 +119,7 @@ function save() {
         // TODO refactoring / optimisation
         let dbObject = createDbObjekt(wordInput.value, channelInput.value, whitelistRadioButton.checked);
         if (storageBlacklist.value !== undefined) {
-            let index = storageBlacklist.value.findIndex(x => x.channel == channelInput.value)
+            let index = storageBlacklist.value.findIndex(y => y.channel == channelInput.value)
             if (index >= 0) {
                 storageBlacklist.value[index].words = dbObject.words;
                 storageBlacklist.value[index].whitelist = dbObject.whitelist;
@@ -165,3 +165,8 @@ function sendPageReloadMessage() {
         console.error(`Error: ${error}`);
     });
 }
+
+// save when save button is clicked
+saveButton.addEventListener('click', (e) => {
+  save();
+})

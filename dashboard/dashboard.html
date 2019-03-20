@@ -6,10 +6,14 @@
         <title>Dashboard</title>
         <script src="./node_modules/clusterize.js/clusterize.min.js"></script>
         <link rel="stylesheet" href="./node_modules/purecss/build/pure-min.css">
+        <link rel="stylesheet" href="./node_modules/fontawesome-free/css/all.css">
         <link rel="stylesheet" href="./dashboard.css">
     </head>
 
     <body>
+      <div id='buttonScroll'>
+        <div class='deleteButtonContainer' id='buttonContent'></div>
+      </div>
         <div class="pure-g">
             <div class="pure-u-1-12"></div>
             <div class="container pure-u-5-6">
@@ -18,7 +22,7 @@
                         <tr>
                             <th width="15%">Channel</th>
                             <th width="20%">Listtype</th>
-                            <th>Values</th>
+                            <th width="50%">Values</th>
                         </tr>
                     </thead>
                     <div id="scrollArea">
@@ -30,6 +34,7 @@
                     </div>
                 </table>
                 <button id="saveButton" class="pure-button button-success">Save</button>
+
                 <div class="explanation">
                     <strong>Listtypes explained</strong><br />
                     W stands for Whitelist, so everything <bold>but</bold> the values is blocked
