@@ -4,6 +4,7 @@ whitelistRadioButton = document.getElementById('whitelist');
 blacklistRadioButton = document.getElementById('blacklist');
 dropdownContent = document.getElementById('dropdown');
 dashboardButton = document.getElementById('dashboard-button');
+saveButton = document.getElementById('save-button');
 
 dropdown.addEventListener('click', (event) => {
     browser.storage.local.get().then(storage => {
@@ -143,3 +144,7 @@ dashboardButton.addEventListener('click', (e) => {
         console.log('error')
     });
 });
+
+saveButton.addEventListener('click', (event) => {
+  save();
+})
