@@ -1,3 +1,4 @@
+// init clusterize.js with emtpy dataset
 data = [];
 clusterize = new Clusterize({
     rows: data,
@@ -45,6 +46,7 @@ function buildDummyRow(counter) {
     return buildTableRow(configEntry, counter)
 }
 
+// button click saves config to local storage
 document.getElementById('saveButton').addEventListener('click', (event) => {
     let tbody = document.getElementById('contentArea');
     let config = {
@@ -57,6 +59,7 @@ document.getElementById('saveButton').addEventListener('click', (event) => {
     });
 });
 
+// builds config entry from table row
 function parseTrowToConfigEntry(entry) {
     let children = entry.children;
     let result = {
@@ -67,6 +70,7 @@ function parseTrowToConfigEntry(entry) {
     return result;
 }
 
+// builds config object from table body
 function parseTbodyToConfig(tbody) {
     let result = [];
     for (let i = 0; i < tbody.children.length; i++) {
