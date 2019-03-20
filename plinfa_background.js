@@ -4,4 +4,4 @@
 //     contexts: ["selection"]
 // }, onCreated);
 //
-// // TODO remove from context menu
+// remove from context menu

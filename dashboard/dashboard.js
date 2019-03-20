@@ -1,3 +1,25 @@
+// -----------------------------------------------------------------------------
+// event listeners
+// -----------------------------------------------------------------------------
+
+// button click saves config to local storage
+document.getElementById('saveButton').addEventListener('click', (event) => {
+    let tbody = document.getElementById('contentArea');
+    let config = {
+        value: parseTbodyToConfig(tbody)
+    };
+    browser.storage.local.set(config).then((e) => {
+        main();
+    }).catch((error) => {
+        console.log(error);
+    });
+});
+
+
+// -----------------------------------------------------------------------------
+// initialisation
+// -----------------------------------------------------------------------------
+
 // init clusterize.js with emtpy dataset
 data = [];
 clusterize = new Clusterize({
@@ -6,8 +28,16 @@ clusterize = new Clusterize({
     contentId: 'contentArea'
 });
 
+// run main
+updateSite();
+
+
+// -----------------------------------------------------------------------------
+// update site
+// -----------------------------------------------------------------------------
+
 // get config from storage, build rows, push them to clusterize
-function main() {
+function updateSite() {
     browser.storage.local.get().then((config) => {
         var data = buildTableRows(config.value);
         clusterize.update(data);
@@ -15,6 +45,11 @@ function main() {
         console.log(error);
     });
 }
+
+
+// -----------------------------------------------------------------------------
+// builder
+// -----------------------------------------------------------------------------
 
 // build table rows from config object
 function buildTableRows(config) {
@@ -46,18 +81,10 @@ function buildDummyRow(counter) {
     return buildTableRow(configEntry, counter)
 }
 
-// button click saves config to local storage
-document.getElementById('saveButton').addEventListener('click', (event) => {
-    let tbody = document.getElementById('contentArea');
-    let config = {
-        value: parseTbodyToConfig(tbody)
-    };
-    browser.storage.local.set(config).then((e) => {
-        main();
-    }).catch((error) => {
-        console.log(error);
-    });
-});
+
+// -----------------------------------------------------------------------------
+// parser (from table to config)
+// -----------------------------------------------------------------------------
 
 // builds config entry from table row
 function parseTrowToConfigEntry(entry) {
@@ -79,5 +106,9 @@ function parseTbodyToConfig(tbody) {
     return result;
 }
 
-// run main
-main();
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
