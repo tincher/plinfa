@@ -53,10 +53,11 @@ function updateSite() {
         let data = buildTableRows(config.value);
         clusterize.update(data);
         delButtons = [];
-        data.forEach((row, counter) => {
-            let btn_str = `<button class='pure-button deleteButton' id=${counter}><i class="fas fa-trash"></i></button>`;
+        // TODO
+        config.value.forEach((confObj) => {
+            let btn_str = `<button class='pure-button deleteButton' id=${confObj.channel}><i class="fas fa-trash"></i></button>`;
             delButtons.push(btn_str);
-        });
+        })
         btnClusterize.update(delButtons);
     }).catch((error) => {
         console.log(error);
@@ -126,11 +127,16 @@ function parseTbodyToConfig(tbody) {
 
 // deletes selected row from config, refreshes dashboard
 btnDiv.addEventListener('click', e => {
-    row_ind = e.target.attributes.id.value;
-    if (row_ind != 'buttonContent') {
-        console.log(row_ind);
+    let channelName = '';
+    if (e.target.tagName === 'I') {
+        channelName = e.target.parentElement.attributes.id.value
+    } else {
+        channelName = e.target.attributes.id.value;
+    }
+    if (channelName !== 'buttonContent') {
+        console.log(channelName);
         browser.storage.local.get().then((config) => {
-            delete config.value[row_ind];
+            config.value = config.value.filter(item => item.channel != channelName);
             browser.storage.local.set(config).then(e => {
                 updateSite();
             });

@@ -117,12 +117,14 @@ function lockInputs(locked) {
 // gets the new config object and saves it, on success it sends a reload message to the tab
 function save() {
     browser.storage.local.get().then((storageBlacklist) => {
+        isNew = true;
         let dbObject = createDbObjekt(wordInput.value, channelInput.value, whitelistRadioButton.checked);
         if (storageBlacklist.value !== undefined) {
             let index = storageBlacklist.value.findIndex(y => y.channel == channelInput.value)
             if (index >= 0) {
                 storageBlacklist.value[index].words = dbObject.words;
                 storageBlacklist.value[index].whitelist = dbObject.whitelist;
+                isNew = false;
             } else {
                 storageBlacklist.value.push(dbObject);
             }
@@ -130,7 +132,7 @@ function save() {
             storageBlacklist.value = [dbObject];
         }
         browser.storage.local.set(storageBlacklist).then(() => {
-            sendPageReloadMessage();
+            sendPageReloadMessage(isNew);
         });
     });
 }
@@ -162,7 +164,7 @@ function buildList(list) {
 // -----------------------------------------------------------------------------
 
 // send simple message to all active, current tabs, extension tab should reload
-function sendPageReloadMessage() {
+function sendPageReloadMessage(newItem) {
     browser.tabs.query({
         currentWindow: true,
         active: true
@@ -171,7 +173,9 @@ function sendPageReloadMessage() {
             browser.tabs.sendMessage(
                 tab.id, {
                     reload: true,
-                    isFromBackground: false
+                    isFromBackground: false,
+                    isFromPopup: true,
+                    isNewItem: newItem
                 }
             ).then(response => {
                 window.close(); // maybe something more green

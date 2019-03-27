@@ -1,9 +1,4 @@
 {
-    "applications": {
-        "gecko": {
-            "id": "joel.ewig@gmail.com"
-        }
-    },
     "background": {
         "scripts": ["plinfa_background.js"]
     },
@@ -31,5 +26,5 @@
         "show_matches": ["https://www.youtube.com/feed/subscriptions*"]
     },
     "permissions": ["contextMenus", "storage", "webRequest", "*://*.youtube.com/*"],
-    "version": "0.3"
+    "version": "0.4"
 }

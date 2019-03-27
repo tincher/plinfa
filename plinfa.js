@@ -3,13 +3,11 @@
 // -----------------------------------------------------------------------------
 
 let childNodeChangeCount = 0;
-let unfiltered_videos;
-let live_videos;
+let unfilteredVideos = [];
+let liveVideos;
 let l = 0;
+let filteredNumber = 0;
 
-function appendToUnfiltered(items) {
-    unfiltered_videos.push(items);
-}
 
 
 // -----------------------------------------------------------------------------
@@ -17,38 +15,40 @@ function appendToUnfiltered(items) {
 // -----------------------------------------------------------------------------
 
 // main function to control the filter
-function main(live_videos, titles) {
+function main(liveVideos, titles) {
     getStorage().then((blacklistObject) => {
         if (blacklistObject.value !== undefined) {
-            // restoreSubs();
-            const all_channels = getChannelNames();
-            filterSubsByBlacklist(live_videos, titles, all_channels, blacklistObject);
+            const allChannels = getChannelNames();
+            filterSubsByBlacklist(liveVideos, titles, allChannels, blacklistObject);
             console.log('filter done');
         }
-    }).catch((e) => console.error(`Error: ${e}`));
+    }).catch((err) => {
+        console.error(`Error: ${err}`)
+    });
 }
 
-function restoreSubs() {
-    for (i = 0; live_videos.length < unfiltered_videos.length; i++) {
-        console.log(live_videos);
-        console.log(unfiltered_videos);
+function restoreSubs(liveVideos) {
+    let temp = true;
+    try {
+        for (i = 0; filteredNumber > 0; i++) {
+            if (liveVideos.item(i) != unfilteredVideos[i]) {
+                if (i < liveVideos.length) {
+                    liveVideos.item(i).parentNode.insertBefore(unfilteredVideos[i], liveVideos.item(i));
+                    filteredNumber--;
+                } else {
+                    liveVideos.item(i).parentNode.insertBefore(unfilteredVideos[i], null);
+                    filteredNumber--;
+                }
+            }
+            if (temp) {
+                temp = false;
+                console.log('subs restored');
+            }
+        }
+    } catch (err) {
+        console.error(`Error: ${err}`);
     }
 }
-//
-// // if active setting is set, the initialization is started
-// // TODO may be removed
-// browser.storage.sync.get('active').then((result) => {
-//     if (result.active || result.active == undefined) {
-//         initObserver();
-//         const checkForSiteChange = function() {
-//             if (childNodeChangeCount > 200) {
-//                 main();
-//             }
-//             childNodeChangeCount = 0;
-//         }
-//         window.setInterval(checkForSiteChange, 200);
-//     }
-// });
 
 
 // -----------------------------------------------------------------------------
@@ -58,21 +58,26 @@ function restoreSubs() {
 // listens for message from popup and runs the main method following the message
 
 browser.runtime.onMessage.addListener(request => {
-    let all_titles = getTitles();
-    let live_videos = getVideos();
-    if (live_videos != undefined) {
+    // only if active is set in sync storage
+    let allTitles = getTitles();
+    let liveVideos = getVideos();
+    if (liveVideos != undefined) {
         if (request.isFromBackground) {
-            if (live_videos.length > l) {
-                if (unfiltered_videos === undefined) {
-                    unfiltered_videos = Array.from(getVideos());
-                }
-                let x = Array.from(live_videos).slice(l);
-                // unfiltered_videos.push(x);
+            if (liveVideos.length > l) {
+                let newStaticVideos = getStaticVideos().slice(l + filteredNumber);
+                unfilteredVideos.push(...newStaticVideos);
+                let newVideos = Array.from(liveVideos).slice(l);
                 l = getVideosLength();
-                main(x, all_titles);
+                main(newVideos, allTitles);
             }
-        } else {
-            main(live_videos, all_titles);
+        } else if (request.isFromPopup) {
+            if (!request.isNewItem) {
+                restoreSubs(liveVideos);
+                unfilteredVideos = getStaticVideos();
+                filteredNumber = 0;
+                l = 0;
+            }
+            main(liveVideos, allTitles);
         }
         return Promise.resolve({
             response: "Message received"
@@ -113,7 +118,7 @@ function initObserver() {
 function getStorage() {
     return browser.storage.local.get().then((result) => {
         return result;
-    }).catch((e) => console.error(`Error: ${e}`));
+    }).catch((err) => console.error(`Error: ${err}`));
 }
 
 
@@ -121,27 +126,29 @@ function getStorage() {
 // SITE INTERACTION
 // -----------------------------------------------------------------------------
 
-function injectSubBackInSite(index) {
-
-}
-
 // remove the subscription video from the site
 function removeSubFromSite(videoTitle, videos, titles) {
     let videoIndex = titles.indexOf(videoTitle);
     delete titles[titles.indexOf(videoTitle)];
     videos[videoIndex].parentNode.removeChild(videos[videoIndex]);
+    filteredNumber++;
+}
+
+function getStaticVideos() {
+    let gridVideos = document.querySelectorAll('ytd-grid-video-renderer');
+    let listVideos = document.querySelectorAll('ytd-item-section-renderer');
+    return Array.from((gridVideos.length > listVideos.length) ? gridVideos : listVideos);
 }
 
 // get the video html elements
 function getVideos() {
-    let grid_videos = document.getElementsByTagName("ytd-grid-video-renderer");
-    let list_videos = document.getElementsByTagName("ytd-item-section-renderer");
-    return (grid_videos.length > list_videos.length) ? grid_videos : list_videos;
+    let gridVideos = document.getElementsByTagName("ytd-grid-video-renderer");
+    let listVideos = document.getElementsByTagName("ytd-item-section-renderer");
+    return (gridVideos.length > listVideos.length) ? gridVideos : listVideos;
 }
 
 function getVideosLength() {
-    let videos = document.querySelectorAll("ytd-grid-video-renderer");
-    return videos.length;
+    return document.querySelectorAll("ytd-grid-video-renderer").length;
 }
 
 // get channel names
@@ -151,17 +158,17 @@ function getChannelNames() {
 
 // get all the titles as string array
 function getTitles() {
-    let grid_titles = document.getElementsByClassName("yt-simple-endpoint style-scope ytd-grid-video-renderer");
+    let gridTitles = document.getElementsByClassName("yt-simple-endpoint style-scope ytd-grid-video-renderer");
     // document.querySelectorAll('a#video-title');
-    let list_titles = document.getElementsByClassName("title-and-badge");
+    let listTitles = document.getElementsByClassName("title-and-badge");
     result = [];
-    if (grid_titles.length > list_titles.length) {
-        for (let i = 0; i < grid_titles.length; i++) {
-            result.push(grid_titles.item(i).text);
+    if (gridTitles.length > listTitles.length) {
+        for (let i = 0; i < gridTitles.length; i++) {
+            result.push(gridTitles.item(i).text);
         }
     } else {
-        for (let i = 0; i < list_titles.length; i++) {
-            title = list_titles.item(i).children.namedItem("video-title").text;
+        for (let i = 0; i < listTitles.length; i++) {
+            title = listTitles.item(i).children.namedItem("video-title").text;
             result.push(title.toLowerCase().split(/\s|\\n/g).filter((x) => x != "").join(" "));
         }
     }
@@ -175,15 +182,20 @@ function getTitles() {
 
 // filter the sub elements for the
 function filterSubsByBlacklist(videos, titles, channels, blacklist) {
-    filteredVideos = videos.filter((video, index) => hasToBeRemoved(blacklist, video.querySelector('h3').textContent, video.querySelector('yt-formatted-string').textContent));
+    filteredVideos = Array.from(videos).filter((video) =>
+        hasToBeRemoved(blacklist, video.querySelector('h3').textContent, video.querySelector('yt-formatted-string').textContent));
     l -= filteredVideos.length;
-    filteredVideos.map(video => video.parentNode.removeChild(video));
-    console.log(`First: ${videos[0].querySelector('h3').textContent}`);
-    console.log(`Last: ${videos[videos.length - 1].querySelector('h3').textContent}`);
+    filteredVideos.map(video => {
+        video.parentNode.removeChild(video);
+        filteredNumber++;
+    });
+    // console.log(`First: ${videos[0].querySelector('h3').textContent}`);
+    // console.log(`Last: ${videos[videos.length - 1].querySelector('h3').textContent}`);
 }
 
 // filters if the series of this channel is in your blacklist or not on your whitelist
 function hasToBeRemoved(list, title, channel) {
+    // TODO refactor to filter
     for (i = 0; i < list.value.length; i++) {
         let elem = list.value[i];
         if (elem.channel == channel.toLowerCase()) {
