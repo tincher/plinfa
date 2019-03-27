@@ -1,0 +1,17 @@
+i {
+    text-decoration: underline;
+}
+
+i:hover {
+    color: #525252;
+    cursor: pointer;
+}
+
+#settings-headline {
+    margin-top: 50px;
+}
+
+#description {
+    column-count: 4;
+    text-align: justify;
+}
