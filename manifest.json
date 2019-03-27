@@ -2,6 +2,11 @@
     "background": {
         "scripts": ["plinfa_background.js"]
     },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "{ab24b74a-06ab-40bd-bd16-11a247e002a4}"
+        }
+    },
     "content_scripts": [{
         "matches": ["https://www.youtube.com/feed/subscriptions*"],
         "js": ["plinfa.js"],
@@ -23,7 +28,7 @@
         "default_icon": "icons/baseline_label_black_48dp.png",
         "default_popup": "popup/popup.html",
         "default_title": "Plinfa",
-        "show_matches": ["https://www.youtube.com/feed/subscriptions*"]
+        "show_matches": ["https://www.youtube.com/*"]
     },
     "permissions": ["contextMenus", "storage", "webRequest", "*://*.youtube.com/*"],
     "version": "0.5"

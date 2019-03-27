@@ -1,4 +1,11 @@
 // -----------------------------------------------------------------------------
+// variables
+// -----------------------------------------------------------------------------
+
+btnDiv = document.getElementById('buttonContent');
+
+
+// -----------------------------------------------------------------------------
 // event listeners
 // -----------------------------------------------------------------------------
 
@@ -21,26 +28,18 @@ document.getElementById('saveButton').addEventListener('click', (event) => {
 // -----------------------------------------------------------------------------
 
 // init clusterize.js with emtpy dataset
-data = [];
-delButtons = [];
 clusterize = new Clusterize({
-    rows: data,
+    rows: [],
     scrollId: 'scrollArea',
     contentId: 'contentArea',
-    show_no_data_row: false,
+    show_no_data_row: true,
 });
 btnClusterize = new Clusterize({
-    rows: delButtons,
+    rows: [],
     scrollId: 'buttonScroll',
     contentId: 'buttonContent',
     show_no_data_row: false
 });
-
-// btnContainer for eventlistener below
-btnDiv = document.getElementById('buttonContent');
-
-// run updateSite
-updateSite();
 
 
 // -----------------------------------------------------------------------------
@@ -50,19 +49,15 @@ updateSite();
 // get config from storage, build rows, push them to clusterize
 function updateSite() {
     browser.storage.local.get().then((config) => {
-        let data = buildTableRows(config.value);
-        clusterize.update(data);
-        delButtons = [];
-        // TODO
-        config.value.forEach((confObj) => {
-            let btn_str = `<button class='pure-button deleteButton' id=${confObj.channel}><i class="fas fa-trash"></i></button>`;
-            delButtons.push(btn_str);
-        })
-        btnClusterize.update(delButtons);
+        clusterize.update(buildTableRows(config.value));
+        btnClusterize.update(buildDeleteButtons(config.value));
     }).catch((error) => {
         console.log(error);
     });
 }
+
+// run updateSite
+updateSite();
 
 
 // -----------------------------------------------------------------------------
@@ -71,14 +66,13 @@ function updateSite() {
 
 // build table rows from config object
 function buildTableRows(config) {
-    let result = [];
-    // TODO map?!
-    config.forEach((configEntry, counter) => {
-        result.push(buildTableRow(configEntry, counter));
-    });
-    return result;
+    return config.map((item, i) => buildTableRow(item, i))
 }
 
+// builds deleteButtons from conf object
+function buildDeleteButtons(config) {
+    return config.value.map((confObj) => `<button class='pure-button deleteButton' id=${confObj.channel}><i class="fas fa-trash"></i></button>`);
+}
 
 // build a single table row from config entry
 function buildTableRow(configEntry, counter) {

@@ -1,3 +1,4 @@
+// TODO docs
 // browser.contextMenus.create({
 //     id: "log-selection",
 //     title: browser.i18n.getMessage("contextMenuItemSelectionLogger"),
@@ -5,6 +6,30 @@
 // }, onCreated);
 //
 // remove from context menu
+
+
+// -----------------------------------------------------------------------------
+// UPBOARDING PAGE
+// -----------------------------------------------------------------------------
+
+browser.runtime.onInstalled.addListener(async ({
+    reason,
+    temporary,
+}) => {
+    if (temporary) return; // skip during development
+    switch (reason) {
+        case "install":
+            await browser.tabs.create({
+                url: browser.runtime.getURL("onboarding/installed.html"),
+            });
+            break;
+        case "update":
+            await browser.tabs.create({
+                url: browser.runtime.getURL("onboarding/updated.html"),
+            });
+            break;
+    }
+});
 
 
 browser.webRequest.onCompleted.addListener((details) => {

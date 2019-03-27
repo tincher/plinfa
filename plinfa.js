@@ -56,12 +56,14 @@ function restoreSubs(liveVideos) {
 // -----------------------------------------------------------------------------
 
 // listens for message from popup and runs the main method following the message
-
 browser.runtime.onMessage.addListener(request => {
-    // only if active is set in sync storage
-    let allTitles = getTitles();
-    let liveVideos = getVideos();
-    if (liveVideos != undefined) {
+    // only if active is set in storage
+    // browser.storage.local.get().then(result => {
+    // console.log(result);
+    // });
+    if (isActive()) {
+        let allTitles = getTitles();
+        let liveVideos = getVideos();
         if (request.isFromBackground) {
             if (liveVideos.length > l) {
                 let newStaticVideos = getStaticVideos().slice(l + filteredNumber);
@@ -78,36 +80,12 @@ browser.runtime.onMessage.addListener(request => {
                 l = 0;
             }
             main(liveVideos, allTitles);
+            return Promise.resolve({
+                response: "Message received"
+            });
         }
-        return Promise.resolve({
-            response: "Message received"
-        });
     }
 });
-
-
-// -----------------------------------------------------------------------------
-// MUTATIONOBSERVER
-// -----------------------------------------------------------------------------
-
-// initialize the observer to count the changes of child nodes
-function initObserver() {
-    const callback = function(mutationsList, observer) {
-        for (let mutation of mutationsList) {
-            if (mutation.type == 'childList') {
-                childNodeChangeCount += 1;
-            }
-        }
-    };
-    const observer = new MutationObserver(callback);
-    const targetNode = document.getElementById("page-manager");
-    const config = {
-        childList: true,
-        subtree: true
-    };
-    observer.observe(targetNode, config);
-}
-
 
 
 // -----------------------------------------------------------------------------
@@ -180,6 +158,11 @@ function getTitles() {
 // ADDITIONAL
 // -----------------------------------------------------------------------------
 
+// returns whether the filter should be active
+function isActive() {
+    return window.location.pathname.includes('/feed/subscriptions');
+}
+
 // filter the sub elements for the
 function filterSubsByBlacklist(videos, titles, channels, blacklist) {
     filteredVideos = Array.from(videos).filter((video) =>
@@ -189,8 +172,6 @@ function filterSubsByBlacklist(videos, titles, channels, blacklist) {
         video.parentNode.removeChild(video);
         filteredNumber++;
     });
-    // console.log(`First: ${videos[0].querySelector('h3').textContent}`);
-    // console.log(`Last: ${videos[videos.length - 1].querySelector('h3').textContent}`);
 }
 
 // filters if the series of this channel is in your blacklist or not on your whitelist

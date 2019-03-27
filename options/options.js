@@ -13,15 +13,15 @@ document.getElementById('active').addEventListener('click', saveOptions);
 // option functions
 // -----------------------------------------------------------------------------
 
-// save the options to sync storage
+// save the options to local storage
 function saveOptions() {
     let checkbox = document.getElementById('active').checked;
-    browser.storage.sync.set({
+    browser.storage.local.set({
         active: checkbox
     });
 }
 
-// restores options from sync storage
+// restores options from local storage
 function restoreOptions() {
     function setCurrentChoice(result) {
         let value = (result.active != undefined) ? result.active : false;
@@ -32,6 +32,6 @@ function restoreOptions() {
         console.log(`Error: ${error}`);
     }
 
-    var getting = browser.storage.sync.get('active');
+    var getting = browser.storage.local.get('active');
     getting.then(setCurrentChoice, onError);
 }
