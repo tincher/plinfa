@@ -1,9 +1,17 @@
 // -----------------------------------------------------------------------------
+// imports
+// -----------------------------------------------------------------------------
+
+import saveService from '../services/saveService.js';
+
+// -----------------------------------------------------------------------------
 // variables
 // -----------------------------------------------------------------------------
 
-btnDiv = document.getElementById('buttonContent');
-
+let btnDiv = document.getElementById('buttonContent');
+let localStorageRadio = document.getElementById('localStorage');
+let syncStorageRadio = document.getElementById('syncStorage');
+let activeCheckbox = document.getElementById('active');
 
 // -----------------------------------------------------------------------------
 // event listeners
@@ -13,9 +21,11 @@ btnDiv = document.getElementById('buttonContent');
 document.getElementById('saveButton').addEventListener('click', (event) => {
     let tbody = document.getElementById('contentArea');
     let config = {
-        value: parseTbodyToConfig(tbody)
+        value: parseTbodyToConfig(tbody),
+        localStorage: localStorageRadio.checked,
+        active: activeCheckbox.checked
     };
-    browser.storage.local.set(config).then((e) => {
+    saveService.save(config).then((e) => {
         updateSite();
     }).catch((error) => {
         console.log(error);
@@ -28,13 +38,13 @@ document.getElementById('saveButton').addEventListener('click', (event) => {
 // -----------------------------------------------------------------------------
 
 // init clusterize.js with emtpy dataset
-clusterize = new Clusterize({
+let clusterize = new Clusterize({
     rows: [],
     scrollId: 'scrollArea',
     contentId: 'contentArea',
     show_no_data_row: true,
 });
-btnClusterize = new Clusterize({
+let btnClusterize = new Clusterize({
     rows: [],
     scrollId: 'buttonScroll',
     contentId: 'buttonContent',
@@ -48,16 +58,24 @@ btnClusterize = new Clusterize({
 
 // get config from storage, build rows, push them to clusterize
 function updateSite() {
-    browser.storage.local.get().then((config) => {
-        clusterize.update(buildTableRows(config.value));
-        btnClusterize.update(buildDeleteButtons(config.value));
+    saveService.get().then((config) => {
+        if (!config.localStorage) {
+            syncStorage.checked = true;
+        } else {
+            localStorage.checked = true;
+        }
+        activeCheckbox.checked = config.active;
+        if (config.value !== undefined) {
+            clusterize.update(buildTableRows(config.value));
+            btnClusterize.update(buildDeleteButtons(config.value));
+        }
     }).catch((error) => {
         console.log(error);
     });
 }
 
 // run updateSite
-updateSite();
+saveService.init().then(() => updateSite());
 
 
 // -----------------------------------------------------------------------------
@@ -71,7 +89,7 @@ function buildTableRows(config) {
 
 // builds deleteButtons from conf object
 function buildDeleteButtons(config) {
-    return config.value.map((confObj) => `<button class='pure-button deleteButton' id=${confObj.channel}><i class="fas fa-trash"></i></button>`);
+    return config.map((confObj) => `<button class='pure-button deleteButton' id=${confObj.channel.replace(' ', '')}><i class="fas fa-trash"></i></button>`);
 }
 
 // build a single table row from config entry
@@ -128,10 +146,9 @@ btnDiv.addEventListener('click', e => {
         channelName = e.target.attributes.id.value;
     }
     if (channelName !== 'buttonContent') {
-        console.log(channelName);
-        browser.storage.local.get().then((config) => {
-            config.value = config.value.filter(item => item.channel != channelName);
-            browser.storage.local.set(config).then(e => {
+        saveService.get().then((config) => {
+            config.value = config.value.filter(item => item.channel.replace(' ', '') != channelName);
+            saveService.save(config).then(e => {
                 updateSite();
             });
         });

@@ -6,7 +6,7 @@ body {
     width: 100%;
 }
 
-.explanation {
+div {
     margin-top: 15px;
 }
 
@@ -16,27 +16,32 @@ input[type="radio"] {
 
 button {
     margin-top: 5px;
+    background-color: green;
+}
+
+#saveButton {
+    background-color: green;
 }
 
 .deleteButton {
-  width: 80%;
-  margin-bottom: 5px;
-  margin-top: 5px;
-  height: 37px;
-  background-color: #e60000;
+    width: 80%;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    height: 37px;
+    background-color: #e60000;
 }
 
 .deleteButtonContainer {
-  /* one row is 47 px */
-  position: relative;
-  float:right;
-  right: 120px;
-  top: 35px;
-  height: 100%;
-  width: 5%;
-  background-color: transparent;
+    /* one row is 47 px */
+    position: relative;
+    float: right;
+    right: 120px;
+    top: 35px;
+    height: 100%;
+    width: 5%;
+    background-color: transparent;
 }
 
 .fa-trash {
-  color: white;
+    color: white;
 }

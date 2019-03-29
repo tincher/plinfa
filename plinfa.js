@@ -16,7 +16,7 @@ let filteredNumber = 0;
 
 // main function to control the filter
 function main(liveVideos, titles) {
-    getStorage().then((blacklistObject) => {
+    get().then((blacklistObject) => {
         if (blacklistObject.value !== undefined) {
             const allChannels = getChannelNames();
             filterSubsByBlacklist(liveVideos, titles, allChannels, blacklistObject);
@@ -49,6 +49,24 @@ function restoreSubs(liveVideos) {
         console.error(`Error: ${err}`);
     }
 }
+// -----------------------------------------------------------------------------
+// storage
+// -----------------------------------------------------------------------------
+
+function save(value) {
+    browser.runtime.sendMessage({
+        operation: "save",
+        value: value
+    }).then(() => console.log('success')).catch((err) => {
+        console.error(`Error: ${err}`)
+    });
+}
+
+function get() {
+    return browser.runtime.sendMessage({
+        operation: "get"
+    });
+}
 
 
 // -----------------------------------------------------------------------------
@@ -57,11 +75,7 @@ function restoreSubs(liveVideos) {
 
 // listens for message from popup and runs the main method following the message
 browser.runtime.onMessage.addListener(request => {
-    // only if active is set in storage
-    // browser.storage.local.get().then(result => {
-    // console.log(result);
-    // });
-    if (isActive()) {
+    isActive().then(() => {
         let allTitles = getTitles();
         let liveVideos = getVideos();
         if (request.isFromBackground) {
@@ -72,6 +86,7 @@ browser.runtime.onMessage.addListener(request => {
                 l = getVideosLength();
                 main(newVideos, allTitles);
             }
+            // TODO also resolve?
         } else if (request.isFromPopup) {
             if (!request.isNewItem) {
                 restoreSubs(liveVideos);
@@ -84,33 +99,12 @@ browser.runtime.onMessage.addListener(request => {
                 response: "Message received"
             });
         }
-    }
+    }).catch((err) => console.error(err));
 });
-
-
-// -----------------------------------------------------------------------------
-// STORAGE INTERACTION
-// -----------------------------------------------------------------------------
-
-// get the current storage
-function getStorage() {
-    return browser.storage.local.get().then((result) => {
-        return result;
-    }).catch((err) => console.error(`Error: ${err}`));
-}
-
 
 // -----------------------------------------------------------------------------
 // SITE INTERACTION
 // -----------------------------------------------------------------------------
-
-// remove the subscription video from the site
-function removeSubFromSite(videoTitle, videos, titles) {
-    let videoIndex = titles.indexOf(videoTitle);
-    delete titles[titles.indexOf(videoTitle)];
-    videos[videoIndex].parentNode.removeChild(videos[videoIndex]);
-    filteredNumber++;
-}
 
 function getStaticVideos() {
     let gridVideos = document.querySelectorAll('ytd-grid-video-renderer');
@@ -160,13 +154,17 @@ function getTitles() {
 
 // returns whether the filter should be active
 function isActive() {
-    return window.location.pathname.includes('/feed/subscriptions');
+    return new Promise((resolve, reject) => {
+        get().then((config) => {
+            if (config.active && window.location.pathname.includes('/feed/subscriptions')) resolve('is active');
+        });
+    })
 }
 
 // filter the sub elements for the
 function filterSubsByBlacklist(videos, titles, channels, blacklist) {
     filteredVideos = Array.from(videos).filter((video) =>
-        hasToBeRemoved(blacklist, video.querySelector('h3').textContent, video.querySelector('yt-formatted-string').textContent));
+        hasToBeRemoved(blacklist, video.querySelector('h3').textContent, video.querySelector('a.yt-formatted-string').textContent));
     l -= filteredVideos.length;
     filteredVideos.map(video => {
         video.parentNode.removeChild(video);
@@ -176,18 +174,7 @@ function filterSubsByBlacklist(videos, titles, channels, blacklist) {
 
 // filters if the series of this channel is in your blacklist or not on your whitelist
 function hasToBeRemoved(list, title, channel) {
-    // TODO refactor to filter
-    for (i = 0; i < list.value.length; i++) {
-        let elem = list.value[i];
-        if (elem.channel == channel.toLowerCase()) {
-            if (elem.words.some(x => title.toLowerCase().includes(x))) {
-                if (!elem.whitelist) {
-                    return true;
-                }
-            } else if (elem.whitelist) {
-                return true;
-            }
-        }
-    }
-    return false;
+    return list.value.filter(elem =>
+        (elem.channel == channel.toLowerCase() && (elem.words.some(x => title.toLowerCase().includes(x) ? !elem.whitelist : elem.whitelist)))
+    ).length > 0;
 }

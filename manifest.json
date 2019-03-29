@@ -1,6 +1,6 @@
 {
     "background": {
-        "scripts": ["plinfa_background.js"]
+        "page": "background/background.html"
     },
     "browser_specific_settings": {
         "gecko": {
@@ -8,7 +8,7 @@
         }
     },
     "content_scripts": [{
-        "matches": ["https://www.youtube.com/feed/subscriptions*"],
+        "matches": ["https://www.youtube.com/*"],
         "js": ["plinfa.js"],
         "run_at": "document_end",
         "all_frames": true

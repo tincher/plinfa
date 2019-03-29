@@ -1,3 +1,21 @@
+import saveService from '../services/saveService.js';
+
+saveService.init().then(() => {
+    browser.runtime.onMessage.addListener(request => {
+        if (request.operation === 'save') {
+            return saveService.save(request.value);
+        } else if (request.operation === 'get') {
+            return saveService.get();
+        }
+        return Promise.resolve('no fitting operation');
+    });
+});
+
+
+
+
+
+
 // TODO docs
 // browser.contextMenus.create({
 //     id: "log-selection",
@@ -44,7 +62,7 @@ browser.webRequest.onCompleted.addListener((details) => {
                     isFromBackground: true
                 }
             ).then(response => {
-                console.log(response);
+                // console.log(response);
             }).catch((error) => {
                 console.error(`Error: ${error}`);
             });

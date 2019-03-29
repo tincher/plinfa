@@ -11,9 +11,9 @@
     </head>
 
     <body>
-      <div id='buttonScroll'>
-        <div class='deleteButtonContainer' id='buttonContent'></div>
-      </div>
+        <div id='buttonScroll'>
+            <div class='deleteButtonContainer' id='buttonContent'></div>
+        </div>
         <div class="pure-g">
             <div class="pure-u-1-12"></div>
             <div class="container pure-u-5-6">
@@ -33,17 +33,28 @@
                         </tbody>
                     </div>
                 </table>
-                <button id="saveButton" class="pure-button button-success">Save</button>
 
                 <div class="explanation">
                     <strong>Listtypes explained</strong><br />
-                    W stands for Whitelist, so everything <bold>but</bold> the values is blocked
-                    B stands for Blacklist, so everything that <bold>contains</bold> the values is blocked
+                    W stands for Whitelist, so everything <u>but</u> the values is blocked
+                    B stands for Blacklist, so everything that <u>contains</u> the values is blocked
                 </div>
+
+                <div class="storage">
+                    <strong>Where we store your settings</strong><br />
+                    <label for="localStorage"><input id="localStorage" name="localStorage" type="radio" checked>Local</label>
+                    <label for="syncStorage"><input id="syncStorage" name="localStorage" type="radio">Synced</label>
+                </div>
+
+                <div class="active">
+                    <strong>Should the filter be active?</strong><br />
+                    <label for="active"><input id="active" name="active" type="checkbox" checked>Active</label>
+                </div>
+                <button id="saveButton" class="pure-button pure-button-primary">Save</button>
             </div>
             <div class="pure-u-1-12"></div>
         </div>
-        <script src="dashboard.js"></script>
+        <script src="dashboard.js" type="module"></script>
     </body>
 
 </html>

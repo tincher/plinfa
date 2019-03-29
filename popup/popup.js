@@ -1,14 +1,17 @@
+import saveService from '../services/saveService.js';
+saveService.init();
+
 // -----------------------------------------------------------------------------
 // variables
 // -----------------------------------------------------------------------------
 
-channelInput = document.getElementById('channelInput');
-wordInput = document.getElementById('wordInput');
-whitelistRadioButton = document.getElementById('whitelist');
-blacklistRadioButton = document.getElementById('blacklist');
-dropdownContent = document.getElementById('dropdown');
-dashboardButton = document.getElementById('dashboard-button');
-saveButton = document.getElementById('save-button');
+let channelInput = document.getElementById('channelInput');
+let wordInput = document.getElementById('wordInput');
+let whitelistRadioButton = document.getElementById('whitelist');
+let blacklistRadioButton = document.getElementById('blacklist');
+let dropdownContent = document.getElementById('dropdown');
+let dashboardButton = document.getElementById('dashboard-button');
+let saveButton = document.getElementById('save-button');
 
 
 // -----------------------------------------------------------------------------
@@ -17,7 +20,7 @@ saveButton = document.getElementById('save-button');
 
 // click listener for the whole dropdown, loads clicked config in popup
 dropdown.addEventListener('click', (event) => {
-    browser.storage.local.get().then(storage => {
+    saveService.get().then(storage => {
         let channelName = event.target.textContent;
         let confObject = storage.value.find(x => x.channel === channelName);
         channelInput.value = channelName;
@@ -72,9 +75,9 @@ dashboardButton.addEventListener('click', (e) => {
 // page interaction
 // -----------------------------------------------------------------------------
 
-// init clusterize with empty dataset
-data = [];
-clusterize = new Clusterize({
+// init clusterize with empty datasave
+let data = [];
+let clusterize = new Clusterize({
     rows: data,
     scrollId: 'dropdown',
     contentId: 'contentArea'
@@ -87,7 +90,7 @@ function showDropdown(show) {
 
 // searches for the input in the channel list in config and fills the dropdown with it
 function searchAndShow(input) {
-    browser.storage.local.get().then((config) => {
+    saveService.get().then((config) => {
         if (input === '') {
             clusterize.update([]);
         } else if (config.value !== undefined) {
@@ -116,8 +119,8 @@ function lockInputs(locked) {
 
 // gets the new config object and saves it, on success it sends a reload message to the tab
 function save() {
-    browser.storage.local.get().then((storageBlacklist) => {
-        isNew = true;
+    saveService.get().then((storageBlacklist) => {
+        let isNew = true;
         let dbObject = createDbObjekt(wordInput.value, channelInput.value, whitelistRadioButton.checked);
         if (storageBlacklist.value !== undefined) {
             let index = storageBlacklist.value.findIndex(y => y.channel == channelInput.value)
@@ -131,7 +134,7 @@ function save() {
         } else {
             storageBlacklist.value = [dbObject];
         }
-        browser.storage.local.set(storageBlacklist).then(() => {
+        saveService.save(storageBlacklist).then(() => {
             sendPageReloadMessage(isNew);
         });
     });
