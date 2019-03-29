@@ -12,6 +12,37 @@ let btnDiv = document.getElementById('buttonContent');
 let localStorageRadio = document.getElementById('localStorage');
 let syncStorageRadio = document.getElementById('syncStorage');
 let activeCheckbox = document.getElementById('active');
+let progress = document.getElementById('progress');
+
+
+// -----------------------------------------------------------------------------
+// progress bar
+// -----------------------------------------------------------------------------
+
+function move(percentage) {
+    let width = progress.style.width.slice(0, -1);
+    let intervalId = setInterval(updateProgress, 7);
+
+    function updateProgress() {
+        if (width >= percentage) {
+            if (width >= 100) {
+                progress.className += 'success-bar';
+                let clearingIntervalId = setInterval(clearProgress, 500);
+
+                function clearProgress() {
+                    progress.className = '';
+                    progress.style.width = '0px';
+                    clearInterval(clearingIntervalId);
+                }
+            }
+            clearInterval(intervalId);
+        } else {
+            width++;
+            progress.style.width = width + '%';
+        }
+    }
+}
+
 
 // -----------------------------------------------------------------------------
 // event listeners
@@ -19,16 +50,20 @@ let activeCheckbox = document.getElementById('active');
 
 // button click saves config to local storage
 document.getElementById('saveButton').addEventListener('click', (event) => {
+    move(10);
     let tbody = document.getElementById('contentArea');
     let config = {
         value: parseTbodyToConfig(tbody),
         localStorage: localStorageRadio.checked,
         active: activeCheckbox.checked
     };
+    move(40);
     saveService.save(config).then((e) => {
+        move(100);
         updateSite();
     }).catch((error) => {
         console.log(error);
+        bar.style.backgroundColor = 'red';
     });
 });
 

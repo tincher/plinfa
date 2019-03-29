@@ -45,3 +45,23 @@ button {
 .fa-trash {
     color: white;
 }
+
+#progress-bar {
+    width: 100%;
+    background-color: grey;
+    position: fixed;
+    left: 0px;
+    bottom: 0px;
+}
+
+#progress {
+    margin-top: 0px;
+    width: 0%;
+    min-height: 5px;
+    background-color: green;
+    transition: min-height 1s cubic-bezier(0, 1, 0.5, 1);
+}
+
+.success-bar {
+    min-height: 15px !important;
+}
