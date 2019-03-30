@@ -1,0 +1,24 @@
+{
+  "name": "plinfa",
+  "version": "1.0.0",
+  "description": "Plinfa lets you modify your youtube subscriptions, by applying a blacklist to your subscriptions. Modifying your blacklist is made easy by either adding them via the usual popup or the search bar icon, in which it already copies the title (or maybe the tags, i dont know yet dude) and lets you edit this.",
+  "main": "plinfa.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tincher/plinfa.git"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/tincher/plinfa/issues"
+  },
+  "homepage": "https://github.com/tincher/plinfa#readme",
+  "dependencies": {
+    "clusterize.js": "^0.18.1",
+    "font-awesome": "^4.7.0",
+    "purecss": "^1.0.0"
+  }
+}
