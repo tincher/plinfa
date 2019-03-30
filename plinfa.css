@@ -114,3 +114,17 @@ i:hover {
 .success-bar {
     min-height: 15px !important;
 }
+
+.searchbarPos {
+    position: absolute;
+    width: 60%;
+    margin: auto;
+}
+
+.searchbarContainer {
+    position: relative;
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+    margin-bottom: 50px
+}

@@ -1,5 +1,11 @@
 import saveService from '../services/saveService.js';
 
+
+// -----------------------------------------------------------------------------
+// MESSAGE LISTENER FOR SAVESERVICE
+// -----------------------------------------------------------------------------
+
+// listens for runtime messges (from plinfa.js) and responds with the fitting operation
 saveService.init().then(() => {
     browser.runtime.onMessage.addListener(request => {
         if (request.operation === 'save') {
@@ -12,24 +18,11 @@ saveService.init().then(() => {
 });
 
 
-
-
-
-
-// TODO docs
-// browser.contextMenus.create({
-//     id: "log-selection",
-//     title: browser.i18n.getMessage("contextMenuItemSelectionLogger"),
-//     contexts: ["selection"]
-// }, onCreated);
-//
-// remove from context menu
-
-
 // -----------------------------------------------------------------------------
 // UPBOARDING PAGE
 // -----------------------------------------------------------------------------
 
+// brings up the update and install tab on fitting occasions
 browser.runtime.onInstalled.addListener(async ({
     reason,
     temporary,
@@ -50,6 +43,11 @@ browser.runtime.onInstalled.addListener(async ({
 });
 
 
+// -----------------------------------------------------------------------------
+// YOUTUBE REQUESTS
+// -----------------------------------------------------------------------------
+
+// fires a message if a requests to youtube is made
 browser.webRequest.onCompleted.addListener((details) => {
     browser.tabs.query({
         currentWindow: true,

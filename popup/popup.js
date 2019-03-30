@@ -1,3 +1,7 @@
+// -----------------------------------------------------------------------------
+// SAVESERVICE
+// -----------------------------------------------------------------------------
+
 import saveService from '../services/saveService.js';
 saveService.init();
 
@@ -13,10 +17,38 @@ let dropdownContent = document.getElementById('dropdown');
 let dashboardButton = document.getElementById('dashboard-button');
 let saveButton = document.getElementById('save-button');
 
+let data = [];
+// init clusterize with empty datasave
+let clusterize = new Clusterize({
+    rows: data,
+    scrollId: 'dropdown',
+    contentId: 'contentArea'
+});
+
+
 
 // -----------------------------------------------------------------------------
-// install eventlisteners
+// EVENTLISTENERS
 // -----------------------------------------------------------------------------
+
+// if enter is pushed in one of the input boxes, it saves the config
+channelInput.addEventListener('keydown', saveOnEnter);
+wordInput.addEventListener('keydown', saveOnEnter);
+
+// save button
+saveButton.addEventListener('click', (event) => {
+    save();
+});
+
+// click listener for dashboard button
+dashboardButton.addEventListener('click', (e) => {
+    let createdTab = browser.tabs.create({
+        url: '/dashboard/dashboard.html'
+    });
+    createdTab.catch((err) => {
+        console.log(`Error: ${err}`)
+    });
+});
 
 // click listener for the whole dropdown, loads clicked config in popup
 dropdown.addEventListener('click', (event) => {
@@ -36,52 +68,19 @@ dropdown.addEventListener('click', (event) => {
 channelInput.addEventListener('input', (event) => {
     if (channelInput.value !== '') {
         lockInputs(false);
-        searchAndShow(channelInput.value);
-        showDropdown(true);
+        searchAndShow(channelInput.value).then((rows) => {
+            showDropdown(rows > 0);
+        });
     } else if (channelInput.value === '') {
         lockInputs(true);
         showDropdown(false);
     }
 });
 
-// save button
-saveButton.addEventListener('click', (event) => {
-    save();
-});
-
-// if enter is pushed in one of the input boxes, it saves the config
-channelInput.addEventListener('keydown', saveOnEnter);
-wordInput.addEventListener('keydown', saveOnEnter);
-
-// checks if enter is pushed, if so it saves
-function saveOnEnter(event) {
-    if (event.keyCode === 13) {
-        save();
-    }
-}
-
-// click listener for dashboard button
-dashboardButton.addEventListener('click', (e) => {
-    var createdTab = browser.tabs.create({
-        url: '/dashboard/dashboard.html'
-    });
-    createdTab.catch((error) => {
-        console.log('error')
-    });
-});
-
 
 // -----------------------------------------------------------------------------
 // page interaction
 // -----------------------------------------------------------------------------
-
-// init clusterize with empty datasave
-let data = [];
-let clusterize = new Clusterize({
-    rows: data,
-    scrollId: 'dropdown',
-    contentId: 'contentArea'
-});
 
 // shows/hides the dropdown
 function showDropdown(show) {
@@ -90,18 +89,17 @@ function showDropdown(show) {
 
 // searches for the input in the channel list in config and fills the dropdown with it
 function searchAndShow(input) {
-    saveService.get().then((config) => {
-        if (input === '') {
-            clusterize.update([]);
-        } else if (config.value !== undefined) {
-            let filteredChannels = config.value.filter(x => x.channel.includes(input));
-            if (filteredChannels.length === 0) {
-                showDropdown(false);
-            } else {
+    return new Promise((resolve, reject) => {
+        saveService.get().then((config) => {
+            if (input === '') {
+                clusterize.update([]);
+            } else if (config.value !== undefined) {
+                let filteredChannels = config.value.filter(x => x.channel.includes(input));
                 let data = buildList(filteredChannels);
                 clusterize.update(data);
             }
-        }
+            resolve(clusterize.getRowsAmount());
+        });
     });
 }
 
@@ -110,12 +108,20 @@ function lockInputs(locked) {
     wordInput.disabled = locked;
     whitelistRadioButton.disabled = locked;
     blacklistRadioButton.disabled = locked;
+    saveButton.disabled = locked;
 }
 
 
 // -----------------------------------------------------------------------------
 // storage related
 // -----------------------------------------------------------------------------
+
+// checks if enter is pushed, if so it saves
+function saveOnEnter(event) {
+    if (event.keyCode === 13) {
+        save();
+    }
+}
 
 // gets the new config object and saves it, on success it sends a reload message to the tab
 function save() {
@@ -156,9 +162,7 @@ function createDbObjekt(words, channel, whitelist) {
 
 // builds html list items from given list
 function buildList(list) {
-    let result = [];
-    list.forEach((element, i) => result.push(`<li id="${i}" class="pure-menu-item pure-menu-link">${element.channel}</li>`));
-    return result;
+    return list.map((element, i) => `<li id="${i}" class="pure-menu-item pure-menu-link">${element.channel}</li>`);
 }
 
 
@@ -190,8 +194,3 @@ function sendPageReloadMessage(newItem) {
         console.error(`Error: ${error}`);
     });
 }
-
-// save when save button is clicked
-saveButton.addEventListener('click', (e) => {
-    save();
-})

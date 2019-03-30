@@ -85,8 +85,10 @@ browser.runtime.onMessage.addListener(request => {
                 let newVideos = Array.from(liveVideos).slice(l);
                 l = getVideosLength();
                 main(newVideos, allTitles);
+                return Promise.resolve({
+                    response: "Message received"
+                });
             }
-            // TODO also resolve?
         } else if (request.isFromPopup) {
             if (!request.isNewItem) {
                 restoreSubs(liveVideos);
@@ -119,6 +121,7 @@ function getVideos() {
     return (gridVideos.length > listVideos.length) ? gridVideos : listVideos;
 }
 
+// get length of video list
 function getVideosLength() {
     return document.querySelectorAll("ytd-grid-video-renderer").length;
 }
