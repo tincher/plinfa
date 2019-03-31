@@ -12,7 +12,6 @@ input[type="radio"][id*='storage'] {
 }
 
 button {
-    margin-top: 5px;
     background-color: green;
 }
 
@@ -89,22 +88,10 @@ i:hover {
 }
 
 .deleteButton {
-    width: 80%;
-    margin-bottom: 5px;
-    margin-top: 5px;
-    height: 37px;
-    background-color: #e60000;
-}
-
-.deleteButtonContainer {
-    /* one row is 47 px */
-    position: relative;
-    float: right;
-    right: 120px;
-    top: 35px;
-    height: 100%;
-    width: 5%;
-    background-color: transparent;
+  position: relative;
+  height: 27px;
+  width: 100%;
+  background-color: red;
 }
 
 .fa-trash {
@@ -116,15 +103,7 @@ i:hover {
 }
 
 .searchbarPos {
-    position: absolute;
-    width: 60%;
-    margin: auto;
-}
-
-.searchbarContainer {
     position: relative;
-    display: flex;
-    flex-flow: column wrap;
-    align-items: center;
-    margin-bottom: 50px
+    width: 100%;
+    margin: auto;
 }

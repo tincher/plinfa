@@ -8,7 +8,7 @@ import saveService from '../services/saveService.js';
 // variables
 // -----------------------------------------------------------------------------
 
-let btnDiv = document.getElementById('buttonContent');
+let delBtns;
 let localStorageRadio = document.getElementById('localStorage');
 let syncStorageRadio = document.getElementById('syncStorage');
 let activeCheckbox = document.getElementById('active');
@@ -67,17 +67,15 @@ document.getElementById('saveButton').addEventListener('click', (event) => {
 	});
 });
 
-// deletes selected row from config, refreshes dashboard
-btnDiv.addEventListener('click', e => {
-	row_ind = e.target.attributes.id.value;
-	if (row_ind != 'buttonContent') {
-		console.log(row_ind);
-		browser.storage.local.get().then((config) => {
-			delete config.value[row_ind];
-			browser.storage.local.set(config).then(e => {
-				updateSite();
-			});
+// search bar listener
+searchBar.addEventListener('input', e => {
+	let inp = searchBar.value;
+	if (inp !== '') {
+		let matches = searchWord(inp).then((res) => {
+			clusterize.update(buildTableRows(res));
 		});
+	} else {
+		updateSite();
 	}
 });
 
@@ -92,12 +90,6 @@ let clusterize = new Clusterize({
 	scrollId: 'scrollArea',
 	contentId: 'contentArea',
 	show_no_data_row: true,
-});
-let btnClusterize = new Clusterize({
-	rows: [],
-	scrollId: 'buttonScroll',
-	contentId: 'buttonContent',
-	show_no_data_row: false
 });
 
 
@@ -116,8 +108,9 @@ function updateSite() {
 		activeCheckbox.checked = config.active;
 		if (config.value !== undefined) {
 			clusterize.update(buildTableRows(config.value));
-			btnClusterize.update(buildDeleteButtons(config.value));
 		}
+		delBtns = Array.from(document.getElementsByClassName('pure-button deleteButton'));
+		delBtns.map(delBtn => addEventListener('click', delRow));
 	}).catch((error) => {
 		console.log(error);
 	});
@@ -136,18 +129,14 @@ function buildTableRows(config) {
 	return config.map((item, i) => buildTableRow(item, i))
 }
 
-// builds deleteButtons from conf object
-function buildDeleteButtons(config) {
-	return config.map((confObj) => `<button class='pure-button deleteButton' id=${confObj.channel.replace(' ', '')}><i class="fas fa-trash"></i></button>`);
-}
-
 // build a single table row from config entry
 function buildTableRow(configEntry, counter) {
 	// seperate words
 	let channelString = `<td>${configEntry.channel}</td>`
 	let listTypeString = `<td><div><input name="whitelist${counter}" type="radio" ${configEntry.whitelist ? "checked" : ""}>Whitelist<input name="whitelist${counter}" type="radio" ${configEntry.whitelist ? "" : "checked"}>Blacklist</div></td>`
-	let valuesString = `<td><input style="width: 100%" type="text" value="${configEntry.words}"></input></td>`
-	return `<tr>${channelString}${listTypeString}${valuesString}</tr>`;
+	let valuesString = `<td><input style="width: 100%" type="text" value="${configEntry.words}"></input></td>`;
+	let delButton = `<td><button class='pure-button deleteButton' id="${configEntry.channel.replace(' ', '')}"><i class="fa fa-trash" aria-hidden="true"></i></button></td>`;
+	return `<tr>${channelString}${listTypeString}${valuesString}${delButton}</tr>`;
 }
 
 // dummy row for testing
@@ -157,7 +146,6 @@ function buildDummyRow(counter) {
 		whitelist: true,
 		words: ['Entry 1', 'entry 2']
 	}
-
 	return buildTableRow(configEntry, counter)
 }
 
@@ -186,29 +174,25 @@ function parseTbodyToConfig(tbody) {
 	return result;
 }
 
-
-// deletes selected row from config, refreshes dashboard
-btnDiv.addEventListener('click', e => {
-	let channelName = '';
-	if (e.target.tagName === 'I') {
-		channelName = e.target.parentElement.attributes.id.value
-	} else {
-		channelName = e.target.attributes.id.value;
-	}
-	if (channelName !== 'buttonContent') {
-		saveService.get().then((config) => {
-			config.value = config.value.filter(item => item.channel.replace(' ', '') != channelName);
-			saveService.save(config).then(e => {
-				updateSite();
-			});
+// deletes a config entry and updates site
+function delRow(e) {
+	let channelName = e.target.id;
+	saveService.get().then((cfg) => {
+		let cfgValue = cfg.value.filter(function(obj) {
+			return (obj.channel.replace(' ', '') != channelName);
 		});
-	}
-});
+		cfg.value = cfgValue;
+		saveService.save(cfg).then(e => {
+			updateSite();
+		});
+	});
+}
 
 // -----------------------------------------------------------------------------
 // search bar function and listener
 // -----------------------------------------------------------------------------
 
+// filters the config by given substring
 function searchWord(chars) {
 	return new Promise((resolve, reject) => {
 		saveService.get().then((cfg) => {
@@ -224,12 +208,3 @@ function searchWord(chars) {
 		});
 	});
 }
-
-searchBar.addEventListener('input', e => {
-	let inp = searchBar.value;
-	if (inp !== '') {
-		let matches = searchWord(inp).then((res) => {
-			clusterize.update(buildTableRows(res));
-		});
-	}
-});
