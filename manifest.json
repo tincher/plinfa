@@ -9,7 +9,9 @@
     },
     "content_scripts": [{
         "matches": ["https://www.youtube.com/*"],
-        "js": ["plinfa.js"],
+        "js": [
+            "./plinfa.js"
+        ],
         "run_at": "document_end",
         "all_frames": true
     }],

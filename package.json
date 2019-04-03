@@ -20,5 +20,8 @@
     "clusterize.js": "^0.18.1",
     "font-awesome": "^4.7.0",
     "purecss": "^1.0.0"
+  },
+  "devDependencies": {
+    "webextension-polyfill": "^0.4.0"
   }
 }
