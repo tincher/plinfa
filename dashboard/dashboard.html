@@ -4,7 +4,6 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Dashboard</title>
-        <script src="../node_modules/clusterize.js/clusterize.min.js"></script>
         <link rel="stylesheet" href="../node_modules/purecss/build/pure-min.css">
         <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
         <link rel="stylesheet" href="../plinfa.css">
@@ -25,19 +24,28 @@
                             <th width="5%">Delete</th>
                         </tr>
                     </thead>
-                    <div id="scrollArea">
-                        <tbody id="contentArea">
-                            <tr>
-                                <td>Loading data…</td>
-                            </tr>
-                        </tbody>
-                    </div>
+                    <tbody id="contentArea">
+                        <tr>
+                            <td>Loading data…</td>
+                        </tr>
+                    </tbody>
                 </table>
+
+                <template id="configRows">
+                    <tr>
+                        <td></td>
+                        <td>
+                            <div><input type="radio">Whitelist<input type="radio">Blacklist</div>
+                        </td>
+                        <td><input id="config-words" type="text"></input></td>
+                        <td><button class='pure-button deleteButton'><i class="fa fa-trash"></i></button></td>
+                    </tr>
+                </template>
 
                 <div class="explanation">
                     <strong>Listtypes explained</strong><br />
-                    W stands for Whitelist, so everything <u>but</u> the values is blocked
-                    B stands for Blacklist, so everything that <u>contains</u> the values is blocked
+                    Whitelist means everything <u>but</u> the values is blocked.
+                    Blacklist means everything that <u>contains</u> the values is blocked.
                 </div>
 
                 <div class="storage">
@@ -51,6 +59,13 @@
                     <label for="active"><input id="active" name="active" type="checkbox" checked>Active</label>
                 </div>
                 <button id="saveButton" class="pure-button pure-button-primary">Save</button>
+                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="donation-button">
+                    <input type="hidden" name="cmd" value="_s-xclick" />
+                    <input type="hidden" name="hosted_button_id" value="JRCTFKKPEQ65J" />
+                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+                    <img alt="" border="0" src="https://www.paypal.com/en_DE/i/scr/pixel.gif" width="1" height="1" />
+                </form>
+
             </div>
             <footer>
                 <div id="progress-bar">

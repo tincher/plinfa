@@ -74,6 +74,10 @@ i:hover {
     transition: min-height 1s cubic-bezier(0, 1, 0.5, 1);
 }
 
+#config-words {
+    width: 100%;
+}
+
 .dropdown-content {
     position: absolute;
     background-color: #f6f6f6;
@@ -88,10 +92,10 @@ i:hover {
 }
 
 .deleteButton {
-  position: relative;
-  height: 27px;
-  width: 100%;
-  background-color: red;
+    position: relative;
+    height: 27px;
+    width: 100%;
+    background-color: red;
 }
 
 .fa-trash {
@@ -106,4 +110,8 @@ i:hover {
     position: relative;
     width: 100%;
     margin: auto;
+}
+
+.donation-button {
+    margin-top: 20px;
 }

@@ -20,27 +20,27 @@ let searchBar = document.getElementById('searchBar');
 // -----------------------------------------------------------------------------
 
 function move(percentage) {
-	let width = progress.style.width.slice(0, -1);
-	let intervalId = setInterval(updateProgress, 7);
+    let width = progress.style.width.slice(0, -1);
+    let intervalId = setInterval(updateProgress, 7);
 
-	function updateProgress() {
-		if (width >= percentage) {
-			if (width >= 100) {
-				progress.className += 'success-bar';
-				let clearingIntervalId = setInterval(clearProgress, 500);
+    function updateProgress() {
+        if (width >= percentage) {
+            if (width >= 100) {
+                progress.className += 'success-bar';
+                let clearingIntervalId = setInterval(clearProgress, 500);
 
-				function clearProgress() {
-					progress.className = '';
-					progress.style.width = '0px';
-					clearInterval(clearingIntervalId);
-				}
-			}
-			clearInterval(intervalId);
-		} else {
-			width++;
-			progress.style.width = width + '%';
-		}
-	}
+                function clearProgress() {
+                    progress.className = '';
+                    progress.style.width = '0px';
+                    clearInterval(clearingIntervalId);
+                }
+            }
+            clearInterval(intervalId);
+        } else {
+            width++;
+            progress.style.width = width + '%';
+        }
+    }
 }
 
 
@@ -50,46 +50,33 @@ function move(percentage) {
 
 // button click saves config to local storage
 document.getElementById('saveButton').addEventListener('click', (event) => {
-	move(10);
-	let tbody = document.getElementById('contentArea');
-	let config = {
-		value: parseTbodyToConfig(tbody),
-		localStorage: localStorageRadio.checked,
-		active: activeCheckbox.checked
-	};
-	move(40);
-	saveService.save(config).then((e) => {
-		move(100);
-		updateSite();
-	}).catch((error) => {
-		console.log(error);
-		bar.style.backgroundColor = 'red';
-	});
+    move(10);
+    let tbody = document.getElementById('contentArea');
+    let config = {
+        value: parseTbodyToConfig(tbody),
+        localStorage: localStorageRadio.checked,
+        active: activeCheckbox.checked
+    };
+    move(40);
+    saveService.save(config).then((e) => {
+        move(100);
+        updateSite();
+    }).catch((error) => {
+        console.log(error);
+        bar.style.backgroundColor = 'red';
+    });
 });
 
 // search bar listener
 searchBar.addEventListener('input', e => {
-	let inp = searchBar.value;
-	if (inp !== '') {
-		let matches = searchWord(inp).then((res) => {
-			clusterize.update(buildTableRows(res));
-		});
-	} else {
-		updateSite();
-	}
-});
-
-
-// -----------------------------------------------------------------------------
-// initialisation
-// -----------------------------------------------------------------------------
-
-// init clusterize.js with emtpy dataset
-let clusterize = new Clusterize({
-	rows: [],
-	scrollId: 'scrollArea',
-	contentId: 'contentArea',
-	show_no_data_row: true,
+    let inp = searchBar.value;
+    if (inp !== '') {
+        searchWord(inp).then((res) => {
+            buildTableRows(res);
+        });
+    } else {
+        updateSite();
+    }
 });
 
 
@@ -99,21 +86,21 @@ let clusterize = new Clusterize({
 
 // get config from storage, build rows, push them to clusterize
 function updateSite() {
-	saveService.get().then((config) => {
-		if (!config.localStorage) {
-			syncStorage.checked = true;
-		} else {
-			localStorage.checked = true;
-		}
-		activeCheckbox.checked = config.active;
-		if (config.value !== undefined) {
-			clusterize.update(buildTableRows(config.value));
-		}
-		delBtns = Array.from(document.getElementsByClassName('pure-button deleteButton'));
-		delBtns.map(delBtn => addEventListener('click', delRow));
-	}).catch((error) => {
-		console.log(error);
-	});
+    saveService.get().then((config) => {
+        if (!config.localStorage) {
+            syncStorage.checked = true;
+        } else {
+            localStorage.checked = true;
+        }
+        activeCheckbox.checked = (config.active === undefined) ? true : config.active;
+        if (config.value !== undefined) {
+            buildTableRows(config.value);
+        }
+        delBtns = Array.from(document.getElementsByClassName('deleteButton'));
+        delBtns.map(delBtn => delBtn.addEventListener('click', deleteRow));
+    }).catch((error) => {
+        console.log(error);
+    });
 }
 
 // run updateSite
@@ -124,29 +111,33 @@ saveService.init().then(() => updateSite());
 // builder
 // -----------------------------------------------------------------------------
 
-// build table rows from config object
-function buildTableRows(config) {
-	return config.map((item, i) => buildTableRow(item, i))
-}
-
 // build a single table row from config entry
-function buildTableRow(configEntry, counter) {
-	// seperate words
-	let channelString = `<td>${configEntry.channel}</td>`
-	let listTypeString = `<td><div><input name="whitelist${counter}" type="radio" ${configEntry.whitelist ? "checked" : ""}>Whitelist<input name="whitelist${counter}" type="radio" ${configEntry.whitelist ? "" : "checked"}>Blacklist</div></td>`
-	let valuesString = `<td><input style="width: 100%" type="text" value="${configEntry.words}"></input></td>`;
-	let delButton = `<td><button class='pure-button deleteButton' id="${configEntry.channel.replace(' ', '')}"><i class="fa fa-trash" aria-hidden="true"></i></button></td>`;
-	return `<tr>${channelString}${listTypeString}${valuesString}${delButton}</tr>`;
+function buildTableRows(config) {
+    let template = document.querySelector('#configRows')
+    let tbody = document.querySelector('tbody');
+    while (tbody.hasChildNodes()) {
+        tbody.removeChild(tbody.firstChild);
+    }
+    for (let i = 0; i < config.length; i++) {
+        let clone = document.importNode(template.content, true);
+        let td = clone.querySelectorAll("td");
+        td[0].textContent = config[i].channel;
+        td[1].children[0].children[config[i].whitelist ? 0 : 1].setAttribute("checked", true);
+        td[2].children[0].setAttribute("value", config[i].words);
+        td[3].children[0].setAttribute("id", config[i].channel);
+        td[3].children[0].children[0].setAttribute("id", config[i].channel);
+        tbody.appendChild(clone);
+    }
 }
 
 // dummy row for testing
 function buildDummyRow(counter) {
-	configEntry = {
-		channel: 'Channel 1',
-		whitelist: true,
-		words: ['Entry 1', 'entry 2']
-	}
-	return buildTableRow(configEntry, counter)
+    configEntry = {
+        channel: 'Channel 1',
+        whitelist: true,
+        words: ['Entry 1', 'entry 2']
+    }
+    return buildTableRow(configEntry, counter)
 }
 
 
@@ -156,36 +147,36 @@ function buildDummyRow(counter) {
 
 // builds config entry from table row
 function parseTrowToConfigEntry(entry) {
-	let children = entry.children;
-	let result = {
-		channel: children.item(0).textContent,
-		words: children.item(2).children.item(0).value.split(','),
-		whitelist: children.item(1).children.item(0).children.item(0).checked
-	};
-	return result;
+    let children = entry.children;
+    let result = {
+        channel: children.item(0).textContent,
+        words: children.item(2).children.item(0).value.split(','),
+        whitelist: children.item(1).children.item(0).children.item(0).checked
+    };
+    return result;
 }
 
 // builds config object from table body
 function parseTbodyToConfig(tbody) {
-	let result = [];
-	for (let i = 0; i < tbody.children.length; i++) {
-		result.push(parseTrowToConfigEntry(tbody.children.item(i)));
-	}
-	return result;
+    let result = [];
+    for (let i = 0; i < tbody.children.length; i++) {
+        result.push(parseTrowToConfigEntry(tbody.children.item(i)));
+    }
+    return result;
 }
 
 // deletes a config entry and updates site
-function delRow(e) {
-	let channelName = e.target.id;
-	saveService.get().then((cfg) => {
-		let cfgValue = cfg.value.filter(function(obj) {
-			return (obj.channel.replace(' ', '') != channelName);
-		});
-		cfg.value = cfgValue;
-		saveService.save(cfg).then(e => {
-			updateSite();
-		});
-	});
+function deleteRow(event) {
+    let channelName = event.target.id;
+    saveService.get().then((config) => {
+        let configValue = config.value.filter(function(obj) {
+            return (obj.channel.replace(' ', '') != channelName);
+        });
+        config.value = configValue;
+        saveService.save(config).then(e => {
+            updateSite();
+        });
+    });
 }
 
 // -----------------------------------------------------------------------------
@@ -194,17 +185,18 @@ function delRow(e) {
 
 // filters the config by given substring
 function searchWord(chars) {
-	return new Promise((resolve, reject) => {
-		saveService.get().then((cfg) => {
-			let matchObj = cfg.value.filter(function(obj) {
-				let foundInd = obj.words.findIndex(function(word) {
-					return word.includes(chars);
-				});
-				return obj.channel.includes(chars) || foundInd > -1
-			});
-			resolve(matchObj);
-		}).catch((error) => {
-			console.log(error);
-		});
-	});
+    return new Promise((resolve, reject) => {
+        saveService.get().then((cfg) => {
+            let searchResults = cfg.value.filter(function(obj) {
+                let foundInd = obj.words.findIndex(function(word) {
+                    return word.includes(chars);
+                });
+                return (obj.channel.includes(chars) || foundInd > -1);
+            });
+            resolve(searchResults);
+        }).catch((err) => {
+            console.error(`Error: ${err}`);
+            reject(error);
+        });
+    });
 }
