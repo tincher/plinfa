@@ -17,14 +17,7 @@ let dropdownContent = document.getElementById('dropdown');
 let dashboardButton = document.getElementById('dashboard-button');
 let saveButton = document.getElementById('save-button');
 
-let data = [];
-// init clusterize with empty datasave
-let clusterize = new Clusterize({
-    rows: data,
-    scrollId: 'dropdown',
-    contentId: 'contentArea'
-});
-
+let rowNumber = 0;
 
 
 // -----------------------------------------------------------------------------
@@ -91,14 +84,13 @@ function showDropdown(show) {
 function searchAndShow(input) {
     return new Promise((resolve, reject) => {
         saveService.get().then((config) => {
-            if (input === '') {
-                clusterize.update([]);
-            } else if (config.value !== undefined) {
+            if (config.value !== undefined) {
                 let filteredChannels = config.value.filter(x => x.channel.includes(input));
-                let data = buildList(filteredChannels);
-                clusterize.update(data);
+                resolve(updateSearch(filteredChannels));
+            } else {
+                resolve(updateSearch([]));
             }
-            resolve(clusterize.getRowsAmount());
+            resolve(0);
         });
     });
 }
@@ -109,6 +101,21 @@ function lockInputs(locked) {
     whitelistRadioButton.disabled = locked;
     blacklistRadioButton.disabled = locked;
     saveButton.disabled = locked;
+}
+
+function updateSearch(data) {
+    while (dropdownContent.children[0].hasChildNodes()) {
+        dropdownContent.children[0].removeChild(dropdownContent.children[0].firstChild);
+    }
+    let template = document.getElementById('search-result');
+    for (let i = 0; i < data.length; i++) {
+        let clone = document.importNode(template.content, true);
+        let li = clone.querySelector('li');
+        li.setAttribute('id', i);
+        li.textContent = data[i].channel;
+        dropdownContent.children[0].appendChild(clone)
+    }
+    return data.length;
 }
 
 
@@ -153,16 +160,6 @@ function createDbObjekt(words, channel, whitelist) {
         whitelist: whitelist,
         words: words.split(',').map(x => x.trim().toLowerCase())
     };
-}
-
-
-// -----------------------------------------------------------------------------
-// builder
-// -----------------------------------------------------------------------------
-
-// builds html list items from given list
-function buildList(list) {
-    return list.map((element, i) => `<li id="${i}" class="pure-menu-item pure-menu-link">${element.channel}</li>`);
 }
 
 

@@ -4,7 +4,7 @@
     },
     "browser_specific_settings": {
         "gecko": {
-            "id": "{ab24b74a-06ab-40bd-bd16-11a247e002a4}"
+            "id": "youfilter@example.org"
         }
     },
     "content_scripts": [{
@@ -15,13 +15,13 @@
         "run_at": "document_end",
         "all_frames": true
     }],
-    "description": "Enables to subscribe to special formats on YT",
+    "description": "Enables to use a blacklist or a whitelist on top of your youtube subscriptions.",
     "homepage_url": "https://tincher.de",
     "icons": {
         "48": "icons/baseline_label_black_48dp.png"
     },
     "manifest_version": 2,
-    "name": "Plinfa",
+    "name": "youfilter",
     "options_ui": {
         "page": "options/options.html"
     },
@@ -33,5 +33,5 @@
         "show_matches": ["https://www.youtube.com/*"]
     },
     "permissions": ["contextMenus", "storage", "webRequest", "*://*.youtube.com/*"],
-    "version": "0.5"
+    "version": "1.1"
 }

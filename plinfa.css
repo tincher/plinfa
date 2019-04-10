@@ -11,6 +11,11 @@ input[type="radio"][id*='storage'] {
     margin: 5px;
 }
 
+input[id="channelInput"] {
+    margin-bottom: 0px !important;
+    margin-bottom: 0px !importantd;
+}
+
 button {
     background-color: green;
 }
@@ -49,7 +54,6 @@ i:hover {
     text-align: justify;
 }
 
-/* dashboard */
 #dashboard-content>div>div>div {
     margin-top: 15px;
 }

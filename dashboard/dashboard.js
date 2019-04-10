@@ -124,7 +124,7 @@ function buildTableRows(config) {
         td[0].textContent = config[i].channel;
         td[1].children[0].children[config[i].whitelist ? 0 : 1].setAttribute("checked", true);
         td[2].children[0].setAttribute("value", config[i].words);
-        td[3].children[0].setAttribute("id", config[i].channel);
+        td[3].children[0].setAttribute("id", config[i].channel.split(' ').join(''));
         td[3].children[0].children[0].setAttribute("id", config[i].channel);
         tbody.appendChild(clone);
     }
@@ -170,7 +170,7 @@ function deleteRow(event) {
     let channelName = event.target.id;
     saveService.get().then((config) => {
         let configValue = config.value.filter(function(obj) {
-            return (obj.channel.replace(' ', '') != channelName);
+            return (obj.channel.split(' ').join('') !== channelName.split(' ').join(''));
         });
         config.value = configValue;
         saveService.save(config).then(e => {

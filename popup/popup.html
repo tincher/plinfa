@@ -3,7 +3,6 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <script src="../node_modules/clusterize.js/clusterize.min.js"></script>
         <link rel="stylesheet" href="../node_modules/purecss/build/pure-min.css">
         <link rel="stylesheet" href="../plinfa.css">
     </head>
@@ -15,9 +14,11 @@
                 <input id="channelInput" type="text" placeholder="Channel">
                 <div id="dropdown" class="dropdown-content" style="display: none;">
                     <ul id="contentArea" class="pure-menu-list">
-                        <li class="clusterize-no-data">Loading data…</li>
                     </ul>
                 </div>
+                <template id="search-result">
+                    <li class="pure-menu-item pure-menu-link"></li>
+                </template>
                 <label for="name"><strong>Word</strong>(s) - Comma seperated</label>
                 <input id="wordInput" type="text" placeholder="Word" disabled>
                 <label for=" listtype"><strong>Listtype</strong></label>
@@ -31,7 +32,6 @@
             <button id="save-button" class="pure-button pure-button-primary" disabled>Save</button>
             <button id="dashboard-button" class="pure-button pure-button-primary">Dashboard</button>
         </footer>
-
         <script src=" popup.js" type="module"></script>
     </body>
 
