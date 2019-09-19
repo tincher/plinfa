@@ -1,8 +1,4 @@
 /* popup */
-label {
-    margin-right: 5px;
-}
-
 input[type="text"] {
     width: 100%;
 }
@@ -12,8 +8,7 @@ input[type="radio"][id*='storage'] {
 }
 
 input[id="channelInput"] {
-    margin-bottom: 0px !important;
-    margin-bottom: 0px !importantd;
+    margin-bottom: 0 !important;
 }
 
 button {
@@ -27,6 +22,10 @@ i {
 i:hover {
     color: #525252;
     cursor: pointer;
+}
+
+a {
+    color: black;
 }
 
 #popup-content {
@@ -45,42 +44,22 @@ i:hover {
     float: right;
 }
 
-#settings-headline {
-    margin-top: 50px;
-}
+/*#settings-headline {*/
+/*    margin-top: 50px;*/
+/*}*/
 
-#description {
-    column-count: 4;
+
+.description {
+    /*column-count: 2;*/
     text-align: justify;
 }
 
-#dashboard-content>div>div>div {
-    margin-top: 15px;
+.installed-content {
+    width: 40%;
+    margin: auto;
+    text-align: center;
 }
 
-#saveButton {
-    background-color: green;
-}
-
-#progress-bar {
-    width: 100%;
-    background-color: grey;
-    position: fixed;
-    left: 0px;
-    bottom: 0px;
-}
-
-#progress {
-    margin-top: 0px;
-    width: 0%;
-    min-height: 5px;
-    background-color: green;
-    transition: min-height 1s cubic-bezier(0, 1, 0.5, 1);
-}
-
-#config-words {
-    width: 100%;
-}
 
 .dropdown-content {
     position: absolute;
@@ -95,27 +74,7 @@ i:hover {
     width: 100%;
 }
 
-.deleteButton {
-    position: relative;
-    height: 27px;
-    width: 100%;
-    background-color: red;
-}
 
-.fa-trash {
-    color: white;
-}
-
-.success-bar {
-    min-height: 15px !important;
-}
-
-.searchbarPos {
-    position: relative;
-    width: 100%;
-    margin: auto;
-}
-
-.donation-button {
-    margin-top: 20px;
+.successInput {
+    border-color: #00b600 !important;
 }

@@ -1,10 +1,12 @@
 // -----------------------------------------------------------------------------
-// DASHBOARD BUTTON
+// DASHBOARD BUTTONS
 // -----------------------------------------------------------------------------
 
-
-document.getElementById('dashboard-link').addEventListener('click', event => {
-    browser.tabs.create({
-        url: browser.runtime.getURL("dashboard/dashboard.html"),
+let dashboardLinks = document.getElementsByClassName('dashboard-link');
+for (let linkElement of dashboardLinks) {
+    linkElement.addEventListener('click', _ => {
+        browser.tabs.create({
+            url: browser.runtime.getURL("dashboard/dashboard.html"),
+        });
     });
-});
+}

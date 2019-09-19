@@ -3,6 +3,7 @@
 // -----------------------------------------------------------------------------
 
 import saveService from '../services/saveService.js';
+
 saveService.init();
 
 // -----------------------------------------------------------------------------
@@ -17,9 +18,6 @@ let dropdownContent = document.getElementById('dropdown');
 let dashboardButton = document.getElementById('dashboard-button');
 let saveButton = document.getElementById('save-button');
 
-let rowNumber = 0;
-
-
 // -----------------------------------------------------------------------------
 // EVENTLISTENERS
 // -----------------------------------------------------------------------------
@@ -29,12 +27,12 @@ channelInput.addEventListener('keydown', saveOnEnter);
 wordInput.addEventListener('keydown', saveOnEnter);
 
 // save button
-saveButton.addEventListener('click', (event) => {
+saveButton.addEventListener('click', (_) => {
     save();
 });
 
 // click listener for dashboard button
-dashboardButton.addEventListener('click', (e) => {
+dashboardButton.addEventListener('click', (_) => {
     let createdTab = browser.tabs.create({
         url: '/dashboard/dashboard.html'
     });
@@ -44,7 +42,7 @@ dashboardButton.addEventListener('click', (e) => {
 });
 
 // click listener for the whole dropdown, loads clicked config in popup
-dropdown.addEventListener('click', (event) => {
+dropdownContent.addEventListener('click', (event) => {
     saveService.get().then(storage => {
         let channelName = event.target.textContent;
         let confObject = storage.value.find(x => x.channel === channelName);
@@ -58,7 +56,7 @@ dropdown.addEventListener('click', (event) => {
 
 // when something is typed in the channel input, it searches for matches,
 // if nothing is in it, the other confis are locked
-channelInput.addEventListener('input', (event) => {
+channelInput.addEventListener('input', (_) => {
     if (channelInput.value !== '') {
         lockInputs(false);
         searchAndShow(channelInput.value).then((rows) => {
@@ -82,7 +80,7 @@ function showDropdown(show) {
 
 // searches for the input in the channel list in config and fills the dropdown with it
 function searchAndShow(input) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, _) => {
         saveService.get().then((config) => {
             if (config.value !== undefined) {
                 let filteredChannels = config.value.filter(x => x.channel.includes(input));
@@ -111,7 +109,7 @@ function updateSearch(data) {
     for (let i = 0; i < data.length; i++) {
         let clone = document.importNode(template.content, true);
         let li = clone.querySelector('li');
-        li.setAttribute('id', i);
+        li.setAttribute('id', i.toString());
         li.textContent = data[i].channel;
         dropdownContent.children[0].appendChild(clone)
     }
@@ -125,7 +123,7 @@ function updateSearch(data) {
 
 // checks if enter is pushed, if so it saves
 function saveOnEnter(event) {
-    if (event.keyCode === 13) {
+    if (event.which === 13) {
         save();
     }
 }
@@ -136,7 +134,7 @@ function save() {
         let isNew = true;
         let dbObject = createDbObjekt(wordInput.value, channelInput.value, whitelistRadioButton.checked);
         if (storageBlacklist.value !== undefined) {
-            let index = storageBlacklist.value.findIndex(y => y.channel == channelInput.value)
+            let index = storageBlacklist.value.findIndex(y => y.channel === channelInput.value);
             if (index >= 0) {
                 storageBlacklist.value[index].words = dbObject.words;
                 storageBlacklist.value[index].whitelist = dbObject.whitelist;
@@ -181,8 +179,8 @@ function sendPageReloadMessage(newItem) {
                     isFromPopup: true,
                     isNewItem: newItem
                 }
-            ).then(response => {
-                window.close(); // maybe something more green
+            ).then(_ => {
+                successfullFeedback();
             }).catch((error) => {
                 console.error(`Error: ${error}`);
             });
@@ -190,4 +188,13 @@ function sendPageReloadMessage(newItem) {
     }).catch((error) => {
         console.error(`Error: ${error}`);
     });
+}
+
+function successfullFeedback() {
+    channelInput.className += 'successInput';
+    wordInput.className += 'successInput';
+
+    // setTimeout(() => channelInput.classList.remove('successInput'), 1000);
+    // setTimeout(() => wordInput.classList.remove('successInput'), 1000);
+    setTimeout(() => window.close(), 1000);
 }

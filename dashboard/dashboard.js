@@ -10,37 +10,84 @@ import saveService from '../services/saveService.js';
 
 let delBtns;
 let localStorageRadio = document.getElementById('localStorage');
-let syncStorageRadio = document.getElementById('syncStorage');
+// let syncStorageRadio = document.getElementById('syncStorage');
 let activeCheckbox = document.getElementById('active');
-let progress = document.getElementById('progress');
+let progressbar = document.getElementById('progressbar');
 let searchBar = document.getElementById('searchBar');
+let downloadButton = document.getElementById('downloadButton');
+let configUploadButton = document.getElementById('configurationFile');
 
-// -----------------------------------------------------------------------------
-// progress bar
-// -----------------------------------------------------------------------------
+let intervalId = undefined;
+let clearingIntervalId = undefined;
 
-function move(percentage) {
-    let width = progress.style.width.slice(0, -1);
-    let intervalId = setInterval(updateProgress, 7);
+configUploadButton.addEventListener('change', updateConfig);
+downloadButton.addEventListener('click', downloadConfigAsJSONFile;
+progressbar.style.width = '0%';
 
-    function updateProgress() {
-        if (width >= percentage) {
-            if (width >= 100) {
-                progress.className += 'success-bar';
-                let clearingIntervalId = setInterval(clearProgress, 500);
 
-                function clearProgress() {
-                    progress.className = '';
-                    progress.style.width = '0px';
-                    clearInterval(clearingIntervalId);
-                }
-            }
-            clearInterval(intervalId);
-        } else {
-            width++;
-            progress.style.width = width + '%';
+function clearProgress() {
+    progressbar.className = '';
+    progressbar.style.width = '0%';
+    clearInterval(clearingIntervalId);
+}
+
+function setProgressTo(percentage) {
+    clearInterval(intervalId);
+    intervalId = setInterval(updateProgress, 7, percentage);
+    showPositiveFeedback();
+}
+
+function updateProgress(percentage) {
+    let width = progressbar.style.width.slice(0, -1);
+    if (width >= percentage) {
+        if (width >= 100) {
+            clearingIntervalId = setInterval(clearProgress, 500);
         }
+        clearInterval(intervalId);
+    } else {
+        width++;
+        progressbar.style.width = width + '%';
     }
+}
+
+function showNegativeFeedback() {
+    progressbar.classList.add('unsuccessful-bar');
+    progressbar.style.width = '100%';
+    clearingIntervalId = setInterval(clearProgress, 500);
+}
+
+function showPositiveFeedback() {
+    progressbar.classList.add('greenbar');
+}
+
+function getConfigurationObjectFromEvent(event) {
+    return JSON.parse(event.target.result);
+
+}
+
+function updateConfig() {
+    let uploadedFiles = configUploadButton.files;
+    if (uploadedFiles.length > 0) {
+        let fr = getFileReader();
+        fr.readAsText(uploadedFiles.item(0));
+    } else {
+        showNegativeFeedback();
+
+    }
+}
+
+function getFileReader() {
+    let fileReader = new FileReader();
+    fileReader.onload = function (event) {
+        let configurationObject = getConfigurationObjectFromEvent(event);
+        showPositiveFeedback();
+        setProgressTo(30);
+        saveService.save(configurationObject);
+        setProgressTo(60);
+        updateSite();
+        setProgressTo(100);
+    };
+    return fileReader;
 }
 
 
@@ -49,21 +96,21 @@ function move(percentage) {
 // -----------------------------------------------------------------------------
 
 // button click saves config to local storage
-document.getElementById('saveButton').addEventListener('click', (event) => {
-    move(10);
+document.getElementById('saveButton').addEventListener('click', (_) => {
+    setProgressTo(10);
     let tbody = document.getElementById('contentArea');
     let config = {
         value: parseTbodyToConfig(tbody),
         localStorage: localStorageRadio.checked,
         active: activeCheckbox.checked
     };
-    move(40);
-    saveService.save(config).then((e) => {
-        move(100);
+    setProgressTo(40);
+    saveService.save(config).then((_) => {
+        setProgressTo(100);
         updateSite();
     }).catch((error) => {
         console.log(error);
-        bar.style.backgroundColor = 'red';
+        showNegativeFeedback();
     });
 });
 
@@ -113,7 +160,8 @@ saveService.init().then(() => updateSite());
 
 // build a single table row from config entry
 function buildTableRows(config) {
-    let template = document.querySelector('#configRows')
+    // Object extractable
+    let template = document.querySelector('#configRows');
     let tbody = document.querySelector('tbody');
     while (tbody.hasChildNodes()) {
         tbody.removeChild(tbody.firstChild);
@@ -130,15 +178,15 @@ function buildTableRows(config) {
     }
 }
 
-// dummy row for testing
-function buildDummyRow(counter) {
-    configEntry = {
-        channel: 'Channel 1',
-        whitelist: true,
-        words: ['Entry 1', 'entry 2']
-    }
-    return buildTableRow(configEntry, counter)
-}
+// // dummy row for testing
+// function buildDummyRow(counter) {
+//     let configEntry = {
+//         channel: 'Channel 1',
+//         whitelist: true,
+//         words: ['Entry 1', 'entry 2']
+//     };
+//     return buildTableRow(configEntry, counter)
+// }
 
 
 // -----------------------------------------------------------------------------
@@ -148,12 +196,11 @@ function buildDummyRow(counter) {
 // builds config entry from table row
 function parseTrowToConfigEntry(entry) {
     let children = entry.children;
-    let result = {
+    return {
         channel: children.item(0).textContent,
         words: children.item(2).children.item(0).value.split(','),
         whitelist: children.item(1).children.item(0).children.item(0).checked
     };
-    return result;
 }
 
 // builds config object from table body
@@ -169,7 +216,7 @@ function parseTbodyToConfig(tbody) {
 function deleteRow(event) {
     let channelName = event.target.id;
     saveService.get().then((config) => {
-        let configValue = config.value.filter(function(obj) {
+        let configValue = config.value.filter(function (obj) {
             return (obj.channel.split(' ').join('') !== channelName.split(' ').join(''));
         });
         config.value = configValue;
@@ -187,16 +234,28 @@ function deleteRow(event) {
 function searchWord(chars) {
     return new Promise((resolve, reject) => {
         saveService.get().then((cfg) => {
-            let searchResults = cfg.value.filter(function(obj) {
-                let foundInd = obj.words.findIndex(function(word) {
+            let searchResults = cfg.value.filter(function (obj) {
+                let foundInd = obj.words.findIndex(function (word) {
                     return word.includes(chars);
                 });
                 return (obj.channel.includes(chars) || foundInd > -1);
             });
             resolve(searchResults);
         }).catch((err) => {
-            console.error(`Error: ${err}`);
-            reject(error);
+            // console.error(`Error: ${err}`);
+            reject(err);
         });
+    });
+}
+
+function downloadConfigAsJSONFile() {
+    saveService.get().then((configuration) => {
+        let downloadElement = document.createElement('a');
+        downloadElement.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(configuration)));
+        downloadElement.setAttribute('download', 'config.json');
+        downloadElement.style.display = 'none';
+        document.body.appendChild(downloadElement);
+        downloadElement.click();
+        document.body.removeChild(downloadElement);
     });
 }

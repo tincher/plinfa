@@ -1,80 +1,113 @@
 <html>
 
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Dashboard</title>
-        <link rel="stylesheet" href="../node_modules/purecss/build/pure-min.css">
-        <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
-        <link rel="stylesheet" href="../plinfa.css">
-    </head>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="../node_modules/purecss/build/pure-min.css">
+    <link rel="stylesheet" href="../node_modules/@fortawesome/fontawesome-free/css/all.css">
+    <link rel="stylesheet" href="../plinfa.css">
+    <link rel="stylesheet" href="./dashboard.css">
+</head>
 
-    <body id="dashboard-content">
-        <div class="pure-g">
-            <div class="pure-u-1-12"></div>
-            <div class="container pure-u-5-6">
-                <h3>Dashboard</h3>
-                <input type="text" class="pure-input-rounded searchbarPos" id='searchBar' placeholder=" Search... "></input>
-                <table class="pure-table pure-table-striped">
-                    <thead>
-                        <tr>
-                            <th width="15%">Channel</th>
-                            <th width="20%">Listtype</th>
-                            <th width="45%">Values</th>
-                            <th width="5%">Delete</th>
-                        </tr>
-                    </thead>
-                    <tbody id="contentArea">
-                        <tr>
-                            <td>Loading data…</td>
-                        </tr>
-                    </tbody>
-                </table>
+<body id="dashboard-content">
+<div class="pure-g">
+    <div class="pure-u-1-12"></div>
+    <div class="container pure-u-5-6">
+        <h3>Dashboard</h3>
+        <input type="text" class="pure-input-rounded searchbarPosition" id='searchBar' placeholder=" Search... "/>
+        <table class="pure-table pure-table-striped">
+            <thead>
+            <tr>
+                <th width="15%">Channel</th>
+                <th width="20%">List type</th>
+                <th width="45%">Values</th>
+                <th width="5%">Delete</th>
+            </tr>
+            </thead>
+            <tbody id="contentArea">
+            <tr>
+                <td>There is no configuration saved yet</td>
+            </tr>
+            </tbody>
+        </table>
 
-                <template id="configRows">
-                    <tr>
-                        <td></td>
-                        <td>
-                            <div><input type="radio" value="whitelist">Whitelist<input type="radio">Blacklist</div>
-                        </td>
-                        <td><input id="config-words" type="text"></input></td>
-                        <td><button class='pure-button deleteButton'><i class="fa fa-trash"></i></button></td>
-                    </tr>
-                </template>
+        <template id="configRows">
+            <tr>
+                <td></td>
+                <td>
+                    <div><input type="radio" value="whitelist"/>Whitelist<input type="radio"/>Blacklist</div>
+                </td>
+                <td><input id="config-words" type="text"/></td>
+                <td>
+                    <button class='pure-button deleteButton'><i class="fa fa-trash"></i></button>
+                </td>
+            </tr>
+        </template>
 
-                <div class="explanation">
-                    <strong>Listtypes explained</strong><br />
-                    Whitelist means everything <u>but</u> the values is blocked.
-                    Blacklist means everything that <u>contains</u> the values is blocked.
-                </div>
 
-                <div class="storage">
-                    <strong>Where we store your settings</strong><br />
-                    <label for="localStorage"><input id="localStorage" name="localStorage" type="radio" checked>Local</label>
-                    <label for="syncStorage"><input id="syncStorage" name="localStorage" type="radio">Synced</label>
-                </div>
-
-                <div class="active">
-                    <strong>Should the filter be active?</strong><br />
-                    <label for="active"><input id="active" name="active" type="checkbox" checked>Active</label>
-                </div>
-                <button id="saveButton" class="pure-button pure-button-primary">Save</button>
-                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="donation-button">
-                    <input type="hidden" name="cmd" value="_s-xclick" />
-                    <input type="hidden" name="hosted_button_id" value="JRCTFKKPEQ65J" />
-                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-                    <img alt="" border="0" src="https://www.paypal.com/en_DE/i/scr/pixel.gif" width="1" height="1" />
-                </form>
-
-            </div>
-            <footer>
-                <div id="progress-bar">
-                    <div id="progress"> </div>
-                </div>
-            </footer>
-            <div class="pure-u-1-12"></div>
+        <div class="storage">
+            <strong>Storage for your configuration</strong><br/>
+            <label for="localStorage"><input id="localStorage" name="localStorage" type="radio" checked>Local</label>
+            <label for="syncStorage"><input id="syncStorage" name="localStorage" type="radio">Synced</label>
         </div>
-        <script src="dashboard.js" type="module"></script>
-    </body>
+
+
+        <div class="active">
+            <strong>Should the filter be active?</strong><br/>
+            <label for="active"><input id="active" name="active" type="checkbox" checked>Active</label>
+        </div>
+        <button id="saveButton" class="pure-button pure-button-primary">Save</button>
+        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" class="donation-button">
+            <input type="hidden" name="cmd" value="_s-xclick"/>
+            <input type="hidden" name="hosted_button_id" value="JRCTFKKPEQ65J"/>
+            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0"
+                   name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button"/>
+            <img alt="" border="0" src="https://www.paypal.com/en_DE/i/scr/pixel.gif" width="1" height="1"/>
+        </form>
+        <div id="explanations">
+            <h4>Explanations</h4>
+
+            <div class="explanation">
+                <strong>Table entries explained</strong><br/>
+                The list type determines whether the videos of this channel are filtered with a whitelist or a
+                blacklist.
+                The values are separated by commas, so the filter filters using the values between two commas.
+                <br>
+                (Note: Do not filter by anything <strong>containing</strong> a comma)
+            </div>
+            <div class="explanation">
+                <strong>Search</strong><br/>
+                You can search for values and channel names.
+                <br>
+                (Note: The search does not work with the visible commas in the values column)
+            </div>
+            <div class="explanation">
+                <strong>List types explained</strong><br/>
+                Whitelist means everything <u>but</u> the values is blocked.
+                Blacklist means everything that <u>contains</u> one of the values is blocked.
+            </div>
+            <div class="explanation">
+                <strong>Storage types explained</strong><br/>
+                Local storage means your settings are only available on this computer.
+                Sync storage means your settings are synced via your firefox/chrome account.
+                <br>
+                (Note: We do NOT store any data, it is ALL managed by firefox/chrome)
+            </div>
+        </div>
+        <button id="downloadButton" class="pure-button">Download your configuration</button>
+        <!-- TODO styling -->
+        <input id="configurationFile" type="file"/>
+
+    </div>
+    <footer>
+        <div id="progressbar-container">
+            <div id="progressbar" class=""></div>
+        </div>
+    </footer>
+    <div class="pure-u-1-12"></div>
+</div>
+<script src="dashboard.js" type="module"></script>
+</body>
 
 </html>

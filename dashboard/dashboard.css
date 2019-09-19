@@ -1,0 +1,71 @@
+label {
+    margin-right: 5px;
+}
+
+#progressbar-container {
+    width: 100%;
+    background-color: grey;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+}
+
+#progressbar {
+    margin-top: 0px;
+    width: 0%;
+    min-height: 5px;
+    transition: min-height 1s cubic-bezier(0, 1, 0.5, 1);
+}
+
+.greenbar {
+    background-color: green;
+    min-height: 15px !important;
+}
+
+.unsuccessful-bar {
+    background-color: indianred;
+    min-height: 15px !important;
+}
+
+.fa-trash {
+    color: white;
+}
+
+.donation-button {
+    margin-top: 20px;
+}
+
+#dashboard-content > div > div > div {
+    margin-top: 15px;
+}
+
+
+#config-words {
+    width: 100%;
+}
+
+.deleteButton {
+    position: relative;
+    height: 27px;
+    width: 100%;
+    background-color: red;
+}
+
+.searchbarPosition {
+    position: relative;
+    width: 100%;
+    margin: auto;
+}
+
+.explanation {
+    margin: 10px;
+}
+
+#explanations {
+    font-size: smaller;
+}
+
+
+#saveButton {
+    background-color: green;
+}
