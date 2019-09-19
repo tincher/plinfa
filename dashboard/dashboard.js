@@ -21,7 +21,7 @@ let intervalId = undefined;
 let clearingIntervalId = undefined;
 
 configUploadButton.addEventListener('change', updateConfig);
-downloadButton.addEventListener('click', downloadConfigAsJSONFile;
+downloadButton.addEventListener('click', downloadConfigAsJSONFile);
 progressbar.style.width = '0%';
 
 
