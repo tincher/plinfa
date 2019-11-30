@@ -67,12 +67,10 @@ function restoreSubs(liveVideos) {
 // -----------------------------------------------------------------------------
 
 function save(value) {
-    browser.runtime
-        .sendMessage({
+    browser.runtime.sendMessage({
             operation: "save",
             value: value
-        })
-        .then(() => console.log("success"))
+        }).then(() => console.log("success"))
         .catch(err => {
             console.error(`Error: ${err}`);
         });
@@ -177,10 +175,10 @@ function getTitles() {
             title = listTitles.item(i).children.namedItem("video-title").text;
             result.push(
                 title
-                    .toLowerCase()
-                    .split(/\s|\\n/g)
-                    .filter(x => x != "")
-                    .join(" ")
+                .toLowerCase()
+                .split(/\s|\\n/g)
+                .filter(x => x != "")
+                .join(" ")
             );
         }
     }
@@ -202,6 +200,7 @@ function isActive() {
                 resolve("is active");
             } else {
                 lastSite = window.location.href;
+                reject('is not active');
             }
         });
     });
@@ -228,12 +227,12 @@ function hasToBeRemoved(list, title, channel) {
     return (
         list.value.filter(
             elem =>
-                elem.channel == channel.toLowerCase() &&
-                elem.words.some(x =>
-                    title.toLowerCase().includes(x)
-                        ? !elem.whitelist
-                        : elem.whitelist
-                )
+            elem.channel == channel.toLowerCase() &&
+            elem.words.some(x =>
+                title.toLowerCase().includes(x) ?
+                !elem.whitelist :
+                elem.whitelist
+            )
         ).length > 0
     );
 }

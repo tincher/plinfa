@@ -27,7 +27,7 @@ browser.runtime.onInstalled.addListener(async ({
     reason,
     temporary,
 }) => {
-    if (temporary) return; // skip during development
+    // if (temporary) return; // skip during development
     switch (reason) {
         case "install":
             await browser.tabs.create({
@@ -60,7 +60,7 @@ browser.webRequest.onCompleted.addListener((details) => {
                     isFromBackground: true
                 }
             ).then(response => {
-                // console.log(response);
+                console.log(response);
             }).catch((error) => {
                 console.error(`Error: ${error}`);
             });

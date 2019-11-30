@@ -10,7 +10,6 @@ import saveService from '../services/saveService.js';
 
 let delBtns;
 let localStorageRadio = document.getElementById('localStorage');
-// let syncStorageRadio = document.getElementById('syncStorage');
 let activeCheckbox = document.getElementById('active');
 let progressbar = document.getElementById('progressbar');
 let searchBar = document.getElementById('searchBar');
@@ -114,7 +113,6 @@ document.getElementById('saveButton').addEventListener('click', (_) => {
     });
 });
 
-// search bar listener
 searchBar.addEventListener('input', e => {
     let inp = searchBar.value;
     if (inp !== '') {
@@ -150,7 +148,6 @@ function updateSite() {
     });
 }
 
-// run updateSite
 saveService.init().then(() => updateSite());
 
 
@@ -177,16 +174,6 @@ function buildTableRows(config) {
         tbody.appendChild(clone);
     }
 }
-
-// // dummy row for testing
-// function buildDummyRow(counter) {
-//     let configEntry = {
-//         channel: 'Channel 1',
-//         whitelist: true,
-//         words: ['Entry 1', 'entry 2']
-//     };
-//     return buildTableRow(configEntry, counter)
-// }
 
 
 // -----------------------------------------------------------------------------

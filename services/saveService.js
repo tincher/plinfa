@@ -20,8 +20,7 @@ class saveService {
                         this.storage = browser.storage.sync
                     }
                     resolve('storage successfully set');
-                })
-                .catch((err) => reject(err));
+                }).catch((err) => reject(err));
         });
     }
 
@@ -48,8 +47,7 @@ class saveService {
                             resolve('successfully stored config')
                         });
                     });
-                })
-                .catch((err) => reject(err));
+                }).catch((err) => reject(err));
         })
     }
 
